@@ -1,0 +1,331 @@
+import { useState, useEffect, useCallback } from "react";
+
+const WARN_DAYS = 2;
+
+function today() {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function daysUntil(dateStr) {
+  if (!dateStr) return null;
+  const due = new Date(dateStr);
+  due.setHours(0, 0, 0, 0);
+  return Math.round((due - today()) / 86400000);
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+}
+
+function urgencyInfo(dateStr) {
+  const diff = daysUntil(dateStr);
+  if (diff === null) return null;
+  if (diff < 0) return { label: "Overdue", color: "#ff5f6d", bg: "rgba(255,95,109,0.18)" };
+  if (diff === 0) return { label: "Due Today", color: "#ff5f6d", bg: "rgba(255,95,109,0.18)" };
+  if (diff === 1) return { label: "Tomorrow", color: "#ffb347", bg: "rgba(255,179,71,0.18)" };
+  if (diff <= WARN_DAYS) return { label: `${diff} days`, color: "#ffd580", bg: "rgba(255,213,128,0.15)" };
+  return null;
+}
+
+const priorityColors = {
+  high: "#ff5f6d",
+  medium: "#ffb347",
+  low: "#6affcb",
+};
+
+const priorityBg = {
+  high: "rgba(255,95,109,0.13)",
+  medium: "rgba(255,179,71,0.13)",
+  low: "rgba(106,255,203,0.1)",
+};
+
+export default function App() {
+  const [tasks, setTasks] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("studyflow_tasks") || "[]");
+    } catch { return []; }
+  });
+  const [filter, setFilter] = useState("all");
+  const [editTask, setEditTask] = useState(null);
+  const [toast, setToast] = useState("");
+  const [toastVisible, setToastVisible] = useState(false);
+  const [form, setForm] = useState({ title: "", subject: "", due: "", priority: "medium" });
+  const [editForm, setEditForm] = useState({});
+
+  // Persist to localStorage
+  useEffect(() => {
+    try { localStorage.setItem("studyflow_tasks", JSON.stringify(tasks)); } catch {}
+  }, [tasks]);
+
+  const showToast = useCallback((msg) => {
+    setToast(msg);
+    setToastVisible(true);
+    setTimeout(() => setToastVisible(false), 2800);
+  }, []);
+
+  function addTask() {
+    if (!form.title.trim()) { showToast("Please enter a task title 📝"); return; }
+    const task = { id: Date.now(), ...form, title: form.title.trim(), subject: form.subject.trim(), done: false };
+    setTasks(prev => [task, ...prev]);
+    setForm({ title: "", subject: "", due: "", priority: "medium" });
+    showToast("Task added! 🎉");
+    const diff = daysUntil(task.due);
+    if (diff !== null && diff <= WARN_DAYS && diff >= 0) {
+      setTimeout(() => showToast(`⚠️ Due ${diff === 0 ? "today" : diff === 1 ? "tomorrow" : `in ${diff} days`}!`), 1400);
+    }
+  }
+
+  function toggleDone(id) {
+    setTasks(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t));
+    const task = tasks.find(t => t.id === id);
+    if (!task?.done) {
+      showToast("Nice work! ✅ Auto-removing in 2s…");
+      setTimeout(() => {
+        setTasks(prev => prev.filter(t => t.id !== id));
+      }, 2000);
+    }
+  }
+
+  function deleteTask(id) {
+    setTasks(prev => prev.filter(t => t.id !== id));
+    showToast("Task deleted 🗑");
+  }
+
+  function openEdit(task) {
+    setEditTask(task);
+    setEditForm({ title: task.title, subject: task.subject, due: task.due || "", priority: task.priority });
+  }
+
+  function saveEdit() {
+    if (!editForm.title?.trim()) { showToast("Title can't be empty"); return; }
+    setTasks(prev => prev.map(t => t.id === editTask.id ? { ...t, ...editForm, title: editForm.title.trim() } : t));
+    setEditTask(null);
+    showToast("Task updated ✏️");
+  }
+
+  const filtered = tasks.filter(t => {
+    if (filter === "pending") return !t.done;
+    if (filter === "done") return t.done;
+    if (filter === "urgent") return !t.done && daysUntil(t.due) !== null && daysUntil(t.due) <= WARN_DAYS;
+    if (filter === "high" || filter === "medium" || filter === "low") return t.priority === filter;
+    return true;
+  });
+
+  const urgentTasks = tasks.filter(t => !t.done && daysUntil(t.due) !== null && daysUntil(t.due) <= WARN_DAYS)
+    .sort((a, b) => new Date(a.due) - new Date(b.due));
+
+  const s = {
+    body: { fontFamily: "'DM Sans', sans-serif", background: "#0e0e12", minHeight: "100vh", color: "#e8e8f0", margin: 0 },
+    ambient: { position: "fixed", inset: 0, background: "radial-gradient(ellipse 60% 40% at 20% 10%, rgba(124,106,255,0.12) 0%, transparent 60%), radial-gradient(ellipse 50% 50% at 80% 80%, rgba(106,255,203,0.07) 0%, transparent 60%)", pointerEvents: "none", zIndex: 0 },
+    wrapper: { position: "relative", zIndex: 1, maxWidth: 640, margin: "0 auto", padding: "36px 16px 80px" },
+    logo: { fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "1.8rem", letterSpacing: "-0.04em", background: "linear-gradient(135deg,#7c6aff,#ff6a9b)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", display: "inline-block", marginBottom: 4 },
+    tagline: { fontSize: "0.83rem", color: "#6b6b80", fontWeight: 300 },
+    statsBar: { display: "flex", gap: 10, marginTop: 18, flexWrap: "wrap" },
+    stat: { background: "#16161d", border: "1px solid #2a2a38", borderRadius: 12, padding: "9px 16px", fontSize: "0.78rem", color: "#6b6b80" },
+    statNum: { fontFamily: "Syne, sans-serif", fontSize: "1.1rem", fontWeight: 700, color: "#e8e8f0", display: "block", lineHeight: 1.2 },
+    statNumUrgent: { fontFamily: "Syne, sans-serif", fontSize: "1.1rem", fontWeight: 700, color: "#ffb347", display: "block", lineHeight: 1.2 },
+
+    banner: { background: "rgba(255,179,71,0.07)", border: "1px solid rgba(255,179,71,0.28)", borderRadius: 16, padding: "14px 18px", marginBottom: 18 },
+    bannerHeader: { display: "flex", alignItems: "center", gap: 8, fontFamily: "Syne,sans-serif", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#ffb347", marginBottom: 10 },
+    pulse: { width: 8, height: 8, background: "#ffb347", borderRadius: "50%", flexShrink: 0 },
+    bannerItem: { display: "flex", alignItems: "center", gap: 10, fontSize: "0.84rem", color: "#e8e8f0", marginBottom: 6 },
+
+    card: (urg, done) => ({
+      background: "#16161d",
+      border: `1px solid ${urg && !done ? (urg.color === "#ff5f6d" ? "rgba(255,95,109,0.35)" : "rgba(255,179,71,0.3)") : "#2a2a38"}`,
+      borderRadius: 16,
+      padding: "15px 16px",
+      display: "flex",
+      alignItems: "center",
+      gap: 12,
+      marginBottom: 10,
+      position: "relative",
+      overflow: "hidden",
+      opacity: done ? 0.6 : 1,
+      transition: "border-color 0.2s",
+    }),
+    stripe: (priority) => ({
+      position: "absolute", left: 0, top: 0, bottom: 0, width: 3,
+      background: priorityColors[priority], borderRadius: "16px 0 0 16px",
+    }),
+    check: (done) => ({
+      width: 22, height: 22, borderRadius: "50%",
+      border: `2px solid ${done ? "#6affcb" : "#2a2a38"}`,
+      background: done ? "#6affcb" : "transparent",
+      cursor: "pointer", flexShrink: 0,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      fontSize: "0.72rem", fontWeight: 700, color: "#0e0e12",
+      transition: "all 0.2s",
+    }),
+    taskBody: { flex: 1, minWidth: 0 },
+    taskTitle: (done) => ({ fontSize: "0.93rem", fontWeight: 500, color: done ? "#6b6b80" : "#e8e8f0", textDecoration: done ? "line-through" : "none", marginBottom: 4, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }),
+    meta: { display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" },
+    tag: (bg, color) => ({ fontSize: "0.68rem", padding: "2px 8px", borderRadius: 20, fontWeight: 500, background: bg, color }),
+    actions: { display: "flex", gap: 6, flexShrink: 0 },
+    btnIcon: (hover) => ({ background: "#1e1e28", border: "1px solid #2a2a38", borderRadius: 8, color: "#6b6b80", cursor: "pointer", fontSize: "0.85rem", padding: "7px 10px", lineHeight: 1 }),
+
+    form: { background: "#16161d", border: "1px solid #2a2a38", borderRadius: 20, padding: 22, marginBottom: 24, position: "relative", overflow: "hidden" },
+    formBar: { position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg,#7c6aff,#ff6a9b,#6affcb)" },
+    formLabel: { fontFamily: "Syne,sans-serif", fontSize: "0.72rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.12em", color: "#6b6b80", marginBottom: 14, display: "block" },
+    input: { background: "#1e1e28", border: "1px solid #2a2a38", borderRadius: 12, color: "#e8e8f0", fontFamily: "DM Sans, sans-serif", fontSize: "0.9rem", padding: "11px 14px", outline: "none", width: "100%", marginBottom: 10, colorScheme: "dark", boxSizing: "border-box" },
+    grid2: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 0 },
+    btnAdd: { width: "100%", padding: 13, background: "linear-gradient(135deg,#7c6aff,#9b6aff)", border: "none", borderRadius: 12, color: "#fff", fontFamily: "Syne,sans-serif", fontSize: "0.93rem", fontWeight: 600, cursor: "pointer", marginTop: 10 },
+
+    filters: { display: "flex", gap: 8, marginBottom: 18, flexWrap: "wrap" },
+    filterBtn: (active) => ({ background: active ? "rgba(124,106,255,0.1)" : "#16161d", border: `1px solid ${active ? "#7c6aff" : "#2a2a38"}`, borderRadius: 20, color: active ? "#7c6aff" : "#6b6b80", fontFamily: "DM Sans, sans-serif", fontSize: "0.78rem", padding: "6px 14px", cursor: "pointer" }),
+
+    sectionLabel: { fontFamily: "Syne,sans-serif", fontSize: "0.68rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em", color: "#6b6b80", marginBottom: 12 },
+    empty: { textAlign: "center", padding: "50px 20px", color: "#6b6b80" },
+
+    overlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", backdropFilter: "blur(6px)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 },
+    modal: { background: "#16161d", border: "1px solid #2a2a38", borderRadius: 24, padding: 26, width: "100%", maxWidth: 400 },
+    modalTitle: { fontFamily: "Syne,sans-serif", fontSize: "1.05rem", fontWeight: 700, marginBottom: 18, background: "linear-gradient(135deg,#7c6aff,#ff6a9b)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" },
+    modalActions: { display: "flex", gap: 10, marginTop: 4 },
+    btnSave: { flex: 1, padding: 12, background: "linear-gradient(135deg,#7c6aff,#9b6aff)", border: "none", borderRadius: 12, color: "#fff", fontFamily: "Syne,sans-serif", fontSize: "0.88rem", fontWeight: 600, cursor: "pointer" },
+    btnCancel: { padding: "12px 18px", background: "#1e1e28", border: "1px solid #2a2a38", borderRadius: 12, color: "#6b6b80", fontFamily: "DM Sans, sans-serif", fontSize: "0.88rem", cursor: "pointer" },
+
+    toast: (visible) => ({ position: "fixed", bottom: 28, left: "50%", transform: `translateX(-50%) translateY(${visible ? 0 : 70}px)`, background: "#1e1e28", border: "1px solid #2a2a38", borderRadius: 12, padding: "11px 22px", fontSize: "0.84rem", color: "#e8e8f0", zIndex: 200, transition: "transform 0.3s, opacity 0.3s", opacity: visible ? 1 : 0, whiteSpace: "nowrap", pointerEvents: "none" }),
+  };
+
+  const filterLabels = { all: "All Tasks", pending: "Pending Tasks", done: "Completed", urgent: "🔥 Due Soon", high: "High Priority", medium: "Medium Priority", low: "Low Priority" };
+
+  return (
+    <div style={s.body}>
+      <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+      <div style={s.ambient} />
+
+      <div style={s.wrapper}>
+        {/* Header */}
+        <header style={{ marginBottom: 36 }}>
+          <div style={s.logo}>StudyFlow</div>
+          <div style={s.tagline}>Your personal academic task manager</div>
+          <div style={s.statsBar}>
+            <div style={s.stat}><span style={s.statNum}>{tasks.length}</span>Total</div>
+            <div style={s.stat}><span style={s.statNum}>{tasks.filter(t => !t.done).length}</span>Pending</div>
+            <div style={s.stat}><span style={s.statNum}>{tasks.filter(t => t.done).length}</span>Done</div>
+            <div style={s.stat}><span style={s.statNumUrgent}>{urgentTasks.length}</span>Due Soon</div>
+          </div>
+        </header>
+
+        {/* Deadline Banner */}
+        {urgentTasks.length > 0 && (
+          <div style={s.banner}>
+            <div style={s.bannerHeader}>
+              <div style={s.pulse} />
+              ⚠️ Upcoming Deadlines
+            </div>
+            {urgentTasks.map(t => {
+              const u = urgencyInfo(t.due);
+              return (
+                <div key={t.id} style={s.bannerItem}>
+                  <div style={{ width: 7, height: 7, borderRadius: "50%", background: u?.color, flexShrink: 0 }} />
+                  <span><strong>{t.title}</strong>{t.subject ? ` · ${t.subject}` : ""}</span>
+                  <span style={{ marginLeft: "auto", fontSize: "0.7rem", padding: "2px 9px", borderRadius: 20, background: u?.bg, color: u?.color, fontWeight: 600, flexShrink: 0 }}>{u?.label}</span>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Add Form */}
+        <div style={s.form}>
+          <div style={s.formBar} />
+          <span style={s.formLabel}>+ New Task</span>
+          <input style={s.input} placeholder="Task title (e.g. Read Chapter 5)" value={form.title}
+            onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+            onKeyDown={e => e.key === "Enter" && addTask()} />
+          <div style={s.grid2}>
+            <input style={{ ...s.input, marginBottom: 0 }} placeholder="Subject (e.g. Math)" value={form.subject}
+              onChange={e => setForm(f => ({ ...f, subject: e.target.value }))} />
+            <input style={{ ...s.input, marginBottom: 0 }} type="date" value={form.due}
+              onChange={e => setForm(f => ({ ...f, due: e.target.value }))} />
+          </div>
+          <select style={{ ...s.input, marginTop: 10 }} value={form.priority}
+            onChange={e => setForm(f => ({ ...f, priority: e.target.value }))}>
+            <option value="medium">⚡ Medium Priority</option>
+            <option value="high">🔴 High Priority</option>
+            <option value="low">🟢 Low Priority</option>
+          </select>
+          <button style={s.btnAdd} onClick={addTask}>Add Task</button>
+        </div>
+
+        {/* Filters */}
+        <div style={s.filters}>
+          {["all","pending","done","urgent","high","low"].map(f => (
+            <button key={f} style={s.filterBtn(filter === f)} onClick={() => setFilter(f)}>
+              {f === "all" ? "All" : f === "pending" ? "Pending" : f === "done" ? "Done" : f === "urgent" ? "🔥 Due Soon" : f === "high" ? "🔴 High" : "🟢 Low"}
+            </button>
+          ))}
+        </div>
+
+        <div style={s.sectionLabel}>{filterLabels[filter]}</div>
+
+        {/* Task List */}
+        {filtered.length === 0 ? (
+          <div style={s.empty}>
+            <div style={{ fontSize: "2.2rem", marginBottom: 10, opacity: 0.4 }}>📭</div>
+            <p style={{ fontSize: "0.88rem" }}>No tasks here yet.</p>
+          </div>
+        ) : filtered.map(task => {
+          const urg = urgencyInfo(task.due);
+          return (
+            <div key={task.id} style={s.card(urg, task.done)}>
+              <div style={s.stripe(task.priority)} />
+              <div style={s.check(task.done)} onClick={() => toggleDone(task.id)}>
+                {task.done && "✓"}
+              </div>
+              <div style={s.taskBody}>
+                <div style={s.taskTitle(task.done)}>{task.title}</div>
+                <div style={s.meta}>
+                  {task.subject && <span style={s.tag("rgba(124,106,255,0.15)", "#a89fff")}>{task.subject}</span>}
+                  {task.due && (
+                    <span style={s.tag(urg ? urg.bg : "rgba(255,106,155,0.12)", urg ? urg.color : "#ff8ab8")}>
+                      📅 {formatDate(task.due)}{urg ? ` · ${urg.label}` : ""}
+                    </span>
+                  )}
+                  <span style={s.tag(priorityBg[task.priority], priorityColors[task.priority])}>{task.priority}</span>
+                </div>
+              </div>
+              <div style={s.actions}>
+                <button style={s.btnIcon()} onClick={() => openEdit(task)}>✏️</button>
+                <button style={s.btnIcon()} onClick={() => deleteTask(task.id)}>🗑</button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Edit Modal */}
+      {editTask && (
+        <div style={s.overlay} onClick={e => e.target === e.currentTarget && setEditTask(null)}>
+          <div style={s.modal}>
+            <div style={s.modalTitle}>Edit Task</div>
+            <input style={s.input} placeholder="Task title" value={editForm.title || ""}
+              onChange={e => setEditForm(f => ({ ...f, title: e.target.value }))} />
+            <input style={s.input} placeholder="Subject" value={editForm.subject || ""}
+              onChange={e => setEditForm(f => ({ ...f, subject: e.target.value }))} />
+            <input style={s.input} type="date" value={editForm.due || ""}
+              onChange={e => setEditForm(f => ({ ...f, due: e.target.value }))} />
+            <select style={s.input} value={editForm.priority || "medium"}
+              onChange={e => setEditForm(f => ({ ...f, priority: e.target.value }))}>
+              <option value="medium">⚡ Medium Priority</option>
+              <option value="high">🔴 High Priority</option>
+              <option value="low">🟢 Low Priority</option>
+            </select>
+            <div style={s.modalActions}>
+              <button style={s.btnSave} onClick={saveEdit}>Save Changes</button>
+              <button style={s.btnCancel} onClick={() => setEditTask(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast */}
+      <div style={s.toast(toastVisible)}>{toast}</div>
+    </div>
+  );
+}
