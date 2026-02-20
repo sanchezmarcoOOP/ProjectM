@@ -15,227 +15,222 @@
   }
 
   body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  body::before { content:''; position:fixed; inset:0; pointer-events:none; z-index:0; background: radial-gradient(ellipse 60% 40% at 20% 10%, rgba(124,106,255,0.12) 0%, transparent 60%), radial-gradient(ellipse 50% 50% at 80% 80%, rgba(106,255,203,0.07) 0%, transparent 60%); }
 
-  body::before {
-    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
-    background: radial-gradient(ellipse 60% 40% at 20% 10%, rgba(124,106,255,0.12) 0%, transparent 60%),
-                radial-gradient(ellipse 50% 50% at 80% 80%, rgba(106,255,203,0.07) 0%, transparent 60%);
-  }
+  .wrapper { position:relative; z-index:1; max-width:700px; margin:0 auto; padding:48px 20px 0; }
 
-  .wrapper { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; padding: 48px 20px 0; }
+  /* Header */
+  header { margin-bottom:32px; }
+  .logo { font-family:'Syne',sans-serif; font-weight:800; font-size:1.9rem; letter-spacing:-0.04em; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; display:inline-block; margin-bottom:4px; }
+  .tagline { font-size:0.84rem; color:var(--muted); font-weight:300; }
+  .stats-bar { display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; }
+  .stat { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:9px 16px; font-size:0.78rem; color:var(--muted); }
+  .stat span { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:700; color:var(--text); display:block; line-height:1.2; }
+  .stat.urgent span { color:var(--warn); }
 
-  /* ── Header ── */
-  header { margin-bottom: 32px; }
-  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.9rem; letter-spacing: -0.04em; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: inline-block; margin-bottom: 4px; }
-  .tagline { font-size: 0.84rem; color: var(--muted); font-weight: 300; }
-  .stats-bar { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
-  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 9px 16px; font-size: 0.78rem; color: var(--muted); }
-  .stat span { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--text); display: block; line-height: 1.2; }
-  .stat.urgent span { color: var(--warn); }
+  /* View Tabs */
+  .view-tabs { display:flex; gap:8px; margin-top:24px; margin-bottom:20px; flex-wrap:wrap; }
+  .view-tab { background:var(--surface); border:1px solid var(--border); border-radius:12px; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:0.82rem; padding:8px 18px; cursor:pointer; transition:all 0.2s; }
+  .view-tab.active { background:rgba(124,106,255,0.12); border-color:var(--accent); color:var(--accent); font-weight:500; }
 
-  /* ── View Tabs ── */
-  .view-tabs { display: flex; gap: 8px; margin-top: 24px; margin-bottom: 20px; }
-  .view-tab { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.82rem; padding: 8px 18px; cursor: pointer; transition: all 0.2s; }
-  .view-tab.active { background: rgba(124,106,255,0.12); border-color: var(--accent); color: var(--accent); font-weight: 500; }
+  /* Notif Permission Bar */
+  .perm-bar { display:none; align-items:center; justify-content:space-between; gap:12px; background:rgba(124,106,255,0.08); border:1px solid rgba(124,106,255,0.25); border-radius:14px; padding:12px 18px; margin-bottom:18px; font-size:0.83rem; color:var(--muted); }
+  .perm-bar.visible { display:flex; }
+  .btn-allow { background:var(--accent); border:none; border-radius:8px; color:#fff; font-family:'Syne',sans-serif; font-size:0.78rem; font-weight:600; padding:7px 16px; cursor:pointer; flex-shrink:0; transition:opacity 0.2s; }
+  .btn-allow:hover { opacity:0.85; }
+  .btn-dismiss { background:none; border:none; color:var(--muted); cursor:pointer; font-size:1rem; padding:4px; flex-shrink:0; }
 
-  /* ── Deadline Banner ── */
-  .notif-banner { background: rgba(255,179,71,0.07); border: 1px solid rgba(255,179,71,0.28); border-radius: 16px; padding: 14px 18px; margin-bottom: 20px; display: none; }
-  .notif-banner.visible { display: block; }
-  .notif-header { display: flex; align-items: center; gap: 8px; font-family: 'Syne', sans-serif; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--warn); margin-bottom: 10px; }
-  .notif-pulse { width: 8px; height: 8px; background: var(--warn); border-radius: 50%; animation: pulse 1.5s infinite; flex-shrink: 0; }
+  /* Deadline Banner */
+  .notif-banner { background:rgba(255,179,71,0.07); border:1px solid rgba(255,179,71,0.28); border-radius:16px; padding:14px 18px; margin-bottom:20px; display:none; }
+  .notif-banner.visible { display:block; }
+  .notif-header { display:flex; align-items:center; gap:8px; font-family:'Syne',sans-serif; font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--warn); margin-bottom:10px; }
+  .notif-pulse { width:8px; height:8px; background:var(--warn); border-radius:50%; animation:pulse 1.5s infinite; flex-shrink:0; }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
-  .notif-item { display: flex; align-items: center; gap: 10px; font-size: 0.84rem; color: var(--text); margin-bottom: 6px; }
-  .notif-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-  .notif-label { margin-left: auto; font-size: 0.7rem; padding: 2px 9px; border-radius: 20px; font-weight: 600; flex-shrink: 0; }
+  .notif-item { display:flex; align-items:center; gap:10px; font-size:0.84rem; color:var(--text); margin-bottom:6px; }
+  .notif-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+  .notif-label { margin-left:auto; font-size:0.7rem; padding:2px 9px; border-radius:20px; font-weight:600; flex-shrink:0; }
 
-  /* ── Add Form ── */
-  .add-form { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 22px; margin-bottom: 24px; position: relative; }
-  .add-form-bar { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3)); border-radius: 20px 20px 0 0; }
-  .form-title { font-family: 'Syne', sans-serif; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 14px; margin-top: 4px; }
-  .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  /* Add Form */
+  .add-form { background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:22px; margin-bottom:24px; position:relative; }
+  .add-form-bar { position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3)); border-radius:20px 20px 0 0; }
+  .form-title { font-family:'Syne',sans-serif; font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.12em; color:var(--muted); margin-bottom:14px; margin-top:4px; }
+  .form-row { display:flex; gap:10px; margin-bottom:10px; }
 
   input[type="text"], input[type="date"], select {
-    background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; color: var(--text);
-    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; padding: 11px 14px; outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s; flex: 1; width: 100%; color-scheme: dark;
+    background:var(--surface2); border:1px solid var(--border); border-radius:12px; color:var(--text);
+    font-family:'DM Sans',sans-serif; font-size:0.9rem; padding:11px 14px; outline:none;
+    transition:border-color 0.2s,box-shadow 0.2s; flex:1; width:100%; color-scheme:dark;
   }
-  input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,106,255,0.15); }
-  select option { background: var(--surface2); }
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  input:focus, select:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(124,106,255,0.15); }
+  select option { background:var(--surface2); }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
+  .form-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:10px; }
 
-  /* ── Image Upload (fixed) ── */
-  /* Hidden real file input, triggered by JS */
-  #input-image, #edit-image { display: none; }
+  /* Category chips */
+  .cat-label { font-family:'Syne',sans-serif; font-size:0.65rem; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:8px; display:block; }
+  .cat-chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+  .cat-chip { background:var(--surface2); border:1.5px solid var(--border); border-radius:20px; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:0.8rem; padding:6px 14px; cursor:pointer; transition:all 0.2s; user-select:none; }
+  .cat-chip:hover { border-color:#4a4a60; color:var(--text); }
+  .cat-chip.selected.exam    { background:rgba(255,95,109,0.15); border-color:#ff5f6d; color:#ff8a93; }
+  .cat-chip.selected.project { background:rgba(124,106,255,0.15); border-color:var(--accent); color:#a89fff; }
+  .cat-chip.selected.homework{ background:rgba(106,255,203,0.12); border-color:var(--accent3); color:var(--accent3); }
+  .cat-chip.selected.other   { background:rgba(255,179,71,0.12); border-color:var(--warn); color:var(--warn); }
 
-  .img-upload-btn {
-    display: flex; align-items: center; gap: 8px;
-    background: var(--surface2); border: 1.5px dashed var(--border);
-    border-radius: 12px; padding: 11px 14px;
-    cursor: pointer; color: var(--muted); font-size: 0.88rem;
-    font-family: 'DM Sans', sans-serif;
-    transition: border-color 0.2s, color 0.2s, background 0.2s;
-    margin-bottom: 10px; width: 100%; text-align: left;
-  }
-  .img-upload-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(124,106,255,0.05); }
-  .img-upload-btn.has-image { border-color: var(--accent3); color: var(--accent3); border-style: solid; }
+  /* Category tags on cards */
+  .tag-cat-exam    { background:rgba(255,95,109,0.15); color:#ff8a93; }
+  .tag-cat-project { background:rgba(124,106,255,0.15); color:#a89fff; }
+  .tag-cat-homework{ background:rgba(106,255,203,0.12); color:var(--accent3); }
+  .tag-cat-other   { background:rgba(255,179,71,0.12); color:var(--warn); }
 
-  .img-preview-wrap { display: none; position: relative; margin-bottom: 10px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
-  .img-preview-wrap.visible { display: block; }
-  .img-preview { width: 100%; max-height: 180px; object-fit: cover; display: block; cursor: pointer; }
-  .img-remove-btn { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.75); border: none; border-radius: 8px; color: #fff; cursor: pointer; font-size: 0.78rem; padding: 5px 10px; font-family: 'DM Sans', sans-serif; }
-  .img-remove-btn:hover { background: var(--danger); }
+  /* Image upload */
+  #input-image, #edit-image { display:none; }
+  .img-upload-btn { display:flex; align-items:center; gap:8px; background:var(--surface2); border:1.5px dashed var(--border); border-radius:12px; padding:11px 14px; cursor:pointer; color:var(--muted); font-size:0.88rem; font-family:'DM Sans',sans-serif; transition:border-color 0.2s,color 0.2s,background 0.2s; margin-bottom:10px; width:100%; text-align:left; }
+  .img-upload-btn:hover { border-color:var(--accent); color:var(--accent); background:rgba(124,106,255,0.05); }
+  .img-upload-btn.has-image { border-color:var(--accent3); color:var(--accent3); border-style:solid; }
+  .img-preview-wrap { display:none; position:relative; margin-bottom:10px; border-radius:12px; overflow:hidden; border:1px solid var(--border); }
+  .img-preview-wrap.visible { display:block; }
+  .img-preview { width:100%; max-height:180px; object-fit:cover; display:block; }
+  .img-remove-btn { position:absolute; top:8px; right:8px; background:rgba(0,0,0,0.75); border:none; border-radius:8px; color:#fff; cursor:pointer; font-size:0.78rem; padding:5px 10px; font-family:'DM Sans',sans-serif; }
+  .img-remove-btn:hover { background:var(--danger); }
 
-  .btn-add { width: 100%; padding: 13px; background: linear-gradient(135deg, var(--accent), #9b6aff); border: none; border-radius: 12px; color: #fff; font-family: 'Syne', sans-serif; font-size: 0.93rem; font-weight: 600; cursor: pointer; margin-top: 10px; transition: opacity 0.2s, transform 0.15s; }
-  .btn-add:hover { opacity: 0.9; transform: translateY(-1px); }
-  .btn-add:active { transform: translateY(0); }
+  .btn-add { width:100%; padding:13px; background:linear-gradient(135deg,var(--accent),#9b6aff); border:none; border-radius:12px; color:#fff; font-family:'Syne',sans-serif; font-size:0.93rem; font-weight:600; cursor:pointer; margin-top:10px; transition:opacity 0.2s,transform 0.15s; }
+  .btn-add:hover { opacity:0.9; transform:translateY(-1px); }
 
-  /* ── Filters ── */
-  .filters { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
-  .filter-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.78rem; padding: 6px 14px; cursor: pointer; transition: all 0.2s; }
-  .filter-btn.active, .filter-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(124,106,255,0.08); }
-  .section-label { font-family: 'Syne', sans-serif; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); margin-bottom: 12px; }
+  /* Filters */
+  .filters { display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
+  .filter-btn { background:var(--surface); border:1px solid var(--border); border-radius:20px; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:0.78rem; padding:6px 14px; cursor:pointer; transition:all 0.2s; }
+  .filter-btn.active,.filter-btn:hover { border-color:var(--accent); color:var(--accent); background:rgba(124,106,255,0.08); }
+  .section-label { font-family:'Syne',sans-serif; font-size:0.68rem; font-weight:700; text-transform:uppercase; letter-spacing:0.14em; color:var(--muted); margin-bottom:12px; }
 
-  /* ── Task Cards ── */
-  #task-list { display: flex; flex-direction: column; gap: 10px; }
-
-  .task-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 15px 16px; display: flex; align-items: flex-start; gap: 12px; position: relative; animation: slideIn 0.3s cubic-bezier(0.34,1.56,0.64,1); transition: border-color 0.2s, transform 0.2s; }
-  .task-card:hover { transform: translateY(-1px); border-color: #3a3a50; }
-  .task-card.urgent-today { border-color: rgba(255,95,109,0.35); }
-  .task-card.urgent-soon  { border-color: rgba(255,179,71,0.3); }
-  .task-card.done         { opacity: 0.6; }
-
+  /* Task Cards */
+  #task-list { display:flex; flex-direction:column; gap:10px; }
+  .task-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:15px 16px; display:flex; align-items:flex-start; gap:12px; position:relative; animation:slideIn 0.3s cubic-bezier(0.34,1.56,0.64,1); transition:border-color 0.2s,transform 0.2s; }
+  .task-card:hover { transform:translateY(-1px); border-color:#3a3a50; }
+  .task-card.urgent-today { border-color:rgba(255,95,109,0.35); }
+  .task-card.urgent-soon  { border-color:rgba(255,179,71,0.3); }
+  .task-card.done         { opacity:0.6; }
   @keyframes slideIn { from{opacity:0;transform:translateY(10px) scale(.97)} to{opacity:1;transform:translateY(0) scale(1)} }
   @keyframes fadeOut { to{opacity:0;transform:scale(.95);max-height:0;padding:0;margin:0;border:none} }
-  .task-card.removing { animation: fadeOut 0.3s ease forwards; pointer-events: none; }
-
+  .task-card.removing { animation:fadeOut 0.3s ease forwards; pointer-events:none; }
   .task-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:16px 0 0 16px; }
-  .task-card[data-priority="high"]::before   { background: var(--danger); }
-  .task-card[data-priority="medium"]::before { background: var(--warn); }
-  .task-card[data-priority="low"]::before    { background: var(--accent3); }
-
+  .task-card[data-priority="high"]::before   { background:var(--danger); }
+  .task-card[data-priority="medium"]::before { background:var(--warn); }
+  .task-card[data-priority="low"]::before    { background:var(--accent3); }
   .task-check { width:22px; height:22px; border:2px solid var(--border); border-radius:50%; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:0.72rem; font-weight:700; color:#0e0e12; transition:all 0.2s; margin-top:1px; }
-  .task-check:hover   { border-color: var(--accent3); }
-  .task-check.checked { background: var(--accent3); border-color: var(--accent3); }
+  .task-check:hover   { border-color:var(--accent3); }
+  .task-check.checked { background:var(--accent3); border-color:var(--accent3); }
+  .task-body { flex:1; min-width:0; }
+  .task-title { font-size:0.93rem; font-weight:500; color:var(--text); margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .task-card.done .task-title { text-decoration:line-through; color:var(--muted); }
+  .task-meta { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+  .tag { font-size:0.68rem; padding:2px 8px; border-radius:20px; font-weight:500; }
+  .tag-subject  { background:rgba(124,106,255,0.15); color:#a89fff; }
+  .tag-due      { background:rgba(255,106,155,0.12); color:#ff8ab8; }
+  .tag-due.overdue,.tag-due.today { background:rgba(255,95,109,0.2); color:var(--danger); font-weight:700; }
+  .tag-due.tomorrow { background:rgba(255,179,71,0.18); color:var(--warn); font-weight:600; }
+  .tag-due.soon     { background:rgba(255,213,128,0.15); color:#ffd580; font-weight:600; }
+  .tag-prio-high    { background:rgba(255,95,109,0.15); color:#ff8a93; }
+  .tag-prio-medium  { background:rgba(255,179,71,0.15); color:#ffc97a; }
+  .tag-prio-low     { background:rgba(106,255,203,0.12); color:#6affcb; }
+  .task-thumb-wrap { margin-top:8px; border-radius:10px; overflow:hidden; border:1px solid var(--border); cursor:pointer; }
+  .task-thumb { width:100%; max-height:120px; object-fit:cover; display:block; }
+  .task-actions { display:flex; gap:6px; flex-shrink:0; opacity:0; transition:opacity 0.2s; }
+  .task-card:hover .task-actions { opacity:1; }
+  .btn-icon { background:var(--surface2); border:1px solid var(--border); border-radius:8px; color:var(--muted); cursor:pointer; font-size:0.85rem; padding:7px 10px; line-height:1; transition:all 0.2s; }
+  .btn-icon.edit:hover   { color:var(--accent); border-color:var(--accent); background:rgba(124,106,255,0.08); }
+  .btn-icon.delete:hover { color:var(--danger); border-color:var(--danger); background:rgba(255,95,109,0.08); }
+  .btn-icon.share:hover  { color:var(--accent3); border-color:var(--accent3); background:rgba(106,255,203,0.08); }
 
-  .task-body { flex: 1; min-width: 0; }
-  .task-title { font-size: 0.93rem; font-weight: 500; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .task-card.done .task-title { text-decoration: line-through; color: var(--muted); }
-  .task-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .empty { text-align:center; padding:50px 20px; color:var(--muted); }
+  .empty-icon { font-size:2.2rem; margin-bottom:10px; opacity:0.4; }
 
-  .tag { font-size: 0.68rem; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
-  .tag-subject  { background: rgba(124,106,255,0.15); color: #a89fff; }
-  .tag-due      { background: rgba(255,106,155,0.12); color: #ff8ab8; }
-  .tag-due.overdue, .tag-due.today    { background: rgba(255,95,109,0.2); color: var(--danger); font-weight:700; }
-  .tag-due.tomorrow { background: rgba(255,179,71,0.18); color: var(--warn); font-weight:600; }
-  .tag-due.soon     { background: rgba(255,213,128,0.15); color: #ffd580; font-weight:600; }
-  .tag-prio-high    { background: rgba(255,95,109,0.15); color: #ff8a93; }
-  .tag-prio-medium  { background: rgba(255,179,71,0.15); color: #ffc97a; }
-  .tag-prio-low     { background: rgba(106,255,203,0.12); color: #6affcb; }
+  /* Calendar */
+  #calendar-view { display:none; }
+  #calendar-view.visible { display:block; }
+  #task-view.hidden { display:none; }
+  .cal-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+  .cal-month { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:700; color:var(--text); }
+  .cal-arrow { background:var(--surface); border:1px solid var(--border); border-radius:10px; color:var(--text); cursor:pointer; font-size:1rem; padding:8px 14px; transition:all 0.2s; }
+  .cal-arrow:hover { border-color:var(--accent); color:var(--accent); }
+  .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+  .cal-day-header { text-align:center; font-family:'Syne',sans-serif; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); padding:6px 0; }
+  .cal-cell { background:var(--surface); border:1px solid var(--border); border-radius:10px; min-height:72px; padding:6px; cursor:pointer; transition:border-color 0.2s; }
+  .cal-cell:hover { border-color:#3a3a50; }
+  .cal-cell.today { border-color:var(--accent); background:rgba(124,106,255,0.05); }
+  .cal-cell.other-month { opacity:0.3; cursor:default; }
+  .cal-cell.has-tasks { border-color:rgba(124,106,255,0.35); }
+  .cal-date { font-family:'Syne',sans-serif; font-size:0.78rem; font-weight:700; color:var(--text); margin-bottom:4px; }
+  .cal-cell.today .cal-date { color:var(--accent); }
+  .cal-dot-wrap { display:flex; flex-wrap:wrap; gap:3px; }
+  .cal-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+  .cal-day-detail { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:18px; margin-top:16px; display:none; }
+  .cal-day-detail.visible { display:block; }
+  .cal-detail-title { font-family:'Syne',sans-serif; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:12px; }
+  .cal-task-row { display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); font-size:0.85rem; }
+  .cal-task-row:last-child { border-bottom:none; }
 
-  /* Task image thumbnail */
-  .task-thumb-wrap { margin-top: 8px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); cursor: pointer; }
-  .task-thumb { width: 100%; max-height: 120px; object-fit: cover; display: block; }
+  /* Lightbox */
+  .lightbox { position:fixed; inset:0; background:rgba(0,0,0,0.88); z-index:300; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity 0.2s; }
+  .lightbox.open { opacity:1; pointer-events:all; }
+  .lightbox img { max-width:100%; max-height:90vh; border-radius:12px; object-fit:contain; }
+  .lightbox-close { position:absolute; top:20px; right:24px; background:rgba(255,255,255,0.1); border:none; border-radius:8px; color:#fff; cursor:pointer; font-size:1.2rem; padding:8px 12px; }
 
-  .task-actions { display: flex; gap: 6px; flex-shrink: 0; opacity: 0; transition: opacity 0.2s; }
-  .task-card:hover .task-actions { opacity: 1; }
-  .btn-icon { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--muted); cursor: pointer; font-size: 0.85rem; padding: 7px 10px; line-height: 1; transition: all 0.2s; }
-  .btn-icon.edit:hover   { color: var(--accent); border-color: var(--accent); background: rgba(124,106,255,0.08); }
-  .btn-icon.delete:hover { color: var(--danger); border-color: var(--danger); background: rgba(255,95,109,0.08); }
+  /* Share Modal */
+  .share-box { background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:14px; font-size:0.88rem; color:var(--text); line-height:1.6; white-space:pre-wrap; word-break:break-word; }
+  .share-btns { display:flex; gap:10px; flex-wrap:wrap; }
+  .btn-share-copy { flex:1; padding:11px; background:linear-gradient(135deg,var(--accent3),#4affb8); border:none; border-radius:12px; color:#0e0e12; font-family:'Syne',sans-serif; font-size:0.88rem; font-weight:700; cursor:pointer; transition:opacity 0.2s; }
+  .btn-share-copy:hover { opacity:0.85; }
 
-  .empty { text-align: center; padding: 50px 20px; color: var(--muted); }
-  .empty-icon { font-size: 2.2rem; margin-bottom: 10px; opacity: 0.4; }
+  /* PDF Export Button in toolbar */
+  .toolbar { display:flex; gap:8px; margin-bottom:18px; justify-content:flex-end; }
+  .btn-export { display:flex; align-items:center; gap:6px; background:var(--surface); border:1px solid var(--border); border-radius:10px; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:0.8rem; padding:7px 14px; cursor:pointer; transition:all 0.2s; }
+  .btn-export:hover { border-color:var(--accent2); color:var(--accent2); background:rgba(255,106,155,0.06); }
 
-  /* ── Calendar View ── */
-  #calendar-view { display: none; }
-  #calendar-view.visible { display: block; }
-  #task-view.hidden { display: none; }
+  /* Footer */
+  footer { border-top:1px solid #1e1e28; margin-top:48px; padding:32px 0 48px; text-align:center; }
+  .footer-title { font-family:'Syne',sans-serif; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.14em; color:#3a3a50; margin-bottom:22px; }
+  .tech-grid { display:flex; justify-content:center; align-items:center; gap:20px; flex-wrap:wrap; }
+  .tech-item { display:flex; flex-direction:column; align-items:center; gap:7px; }
+  .tech-logo { border-radius:6px; box-shadow:0 2px 12px rgba(0,0,0,0.3); display:block; width:40px; height:40px; object-fit:contain; }
+  .tech-name { font-size:0.63rem; color:#4a4a60; font-family:'DM Sans',sans-serif; font-weight:500; }
+  .footer-tagline { margin-top:24px; font-size:0.65rem; color:#2a2a38; font-family:'DM Sans',sans-serif; letter-spacing:0.05em; }
 
-  .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-  .cal-month { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--text); }
-  .cal-arrow { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text); cursor: pointer; font-size: 1rem; padding: 8px 14px; transition: all 0.2s; }
-  .cal-arrow:hover { border-color: var(--accent); color: var(--accent); }
+  /* Modal */
+  .modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.65); backdrop-filter:blur(6px); z-index:100; display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; pointer-events:none; transition:opacity 0.2s; }
+  .modal-backdrop.open { opacity:1; pointer-events:all; }
+  .modal { background:var(--surface); border:1px solid var(--border); border-radius:24px; padding:26px; width:100%; max-width:420px; transform:translateY(20px) scale(0.97); transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1); max-height:90vh; overflow-y:auto; }
+  .modal-backdrop.open .modal { transform:translateY(0) scale(1); }
+  .modal-title { font-family:'Syne',sans-serif; font-size:1.05rem; font-weight:700; margin-bottom:18px; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+  .modal input, .modal select { margin-bottom:10px; }
+  .modal-actions { display:flex; gap:10px; margin-top:4px; }
+  .btn-save { flex:1; padding:12px; background:linear-gradient(135deg,var(--accent),#9b6aff); border:none; border-radius:12px; color:#fff; font-family:'Syne',sans-serif; font-size:0.88rem; font-weight:600; cursor:pointer; }
+  .btn-save:hover { opacity:0.9; }
+  .btn-cancel { padding:12px 18px; background:var(--surface2); border:1px solid var(--border); border-radius:12px; color:var(--muted); font-family:'DM Sans',sans-serif; font-size:0.88rem; cursor:pointer; }
+  .btn-cancel:hover { color:var(--text); border-color:#3a3a50; }
 
-  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
-  .cal-day-header { text-align: center; font-family: 'Syne', sans-serif; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding: 6px 0; }
-  .cal-cell { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; min-height: 72px; padding: 6px; cursor: pointer; transition: border-color 0.2s; }
-  .cal-cell:hover { border-color: #3a3a50; }
-  .cal-cell.today { border-color: var(--accent); background: rgba(124,106,255,0.05); }
-  .cal-cell.other-month { opacity: 0.3; cursor: default; }
-  .cal-cell.has-tasks { border-color: rgba(124,106,255,0.35); }
-  .cal-date { font-family: 'Syne', sans-serif; font-size: 0.78rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
-  .cal-cell.today .cal-date { color: var(--accent); }
-  .cal-dot-wrap { display: flex; flex-wrap: wrap; gap: 3px; }
-  .cal-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  /* Toast */
+  .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(80px); background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:11px 22px; font-size:0.84rem; color:var(--text); z-index:200; transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1),opacity 0.3s; opacity:0; white-space:nowrap; pointer-events:none; }
+  .toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
 
-  .cal-day-detail { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-top: 16px; display: none; }
-  .cal-day-detail.visible { display: block; }
-  .cal-detail-title { font-family: 'Syne', sans-serif; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 12px; }
-  .cal-task-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
-  .cal-task-row:last-child { border-bottom: none; }
+  /* Confetti */
+  #confetti-canvas { position:fixed; inset:0; pointer-events:none; z-index:999; }
 
-  /* ── Lightbox ── */
-  .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 300; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
-  .lightbox.open { opacity: 1; pointer-events: all; }
-  .lightbox img { max-width: 100%; max-height: 90vh; border-radius: 12px; object-fit: contain; }
-  .lightbox-close { position: absolute; top: 20px; right: 24px; background: rgba(255,255,255,0.1); border: none; border-radius: 8px; color: #fff; cursor: pointer; font-size: 1.2rem; padding: 8px 12px; }
-
-  /* ── Footer ── */
-  footer { border-top: 1px solid #1e1e28; margin-top: 48px; padding: 32px 0 48px; text-align: center; }
-  .footer-title { font-family: 'Syne', sans-serif; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: #3a3a50; margin-bottom: 22px; }
-  .tech-grid { display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; }
-  .tech-item { display: flex; flex-direction: column; align-items: center; gap: 7px; }
-  .tech-logo { border-radius: 6px; box-shadow: 0 2px 12px rgba(0,0,0,0.3); display: block; width: 40px; height: 40px; object-fit: contain; }
-  .tech-name { font-size: 0.63rem; color: #4a4a60; font-family: 'DM Sans', sans-serif; font-weight: 500; }
-  .footer-tagline { margin-top: 24px; font-size: 0.65rem; color: #2a2a38; font-family: 'DM Sans', sans-serif; letter-spacing: 0.05em; }
-
-  /* ── Modal ── */
-  .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(6px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
-  .modal-backdrop.open { opacity: 1; pointer-events: all; }
-  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 26px; width: 100%; max-width: 420px; transform: translateY(20px) scale(0.97); transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1); max-height: 90vh; overflow-y: auto; }
-  .modal-backdrop.open .modal { transform: translateY(0) scale(1); }
-  .modal-title { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 18px; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-  .modal input, .modal select { margin-bottom: 10px; }
-  .modal-actions { display: flex; gap: 10px; margin-top: 4px; }
-  .btn-save { flex: 1; padding: 12px; background: linear-gradient(135deg, var(--accent), #9b6aff); border: none; border-radius: 12px; color: #fff; font-family: 'Syne', sans-serif; font-size: 0.88rem; font-weight: 600; cursor: pointer; }
-  .btn-save:hover { opacity: 0.9; }
-  .btn-cancel { padding: 12px 18px; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.88rem; cursor: pointer; }
-  .btn-cancel:hover { color: var(--text); border-color: #3a3a50; }
-
-  /* ── Toast ── */
-  .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 11px 22px; font-size: 0.84rem; color: var(--text); z-index: 200; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s; opacity: 0; white-space: nowrap; pointer-events: none; }
-  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-
-  /* ── Confetti ── */
-  #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 999; }
-
-  /* ── Notification Permission Bar ── */
-  .perm-bar { display: none; align-items: center; justify-content: space-between; gap: 12px; background: rgba(124,106,255,0.08); border: 1px solid rgba(124,106,255,0.25); border-radius: 14px; padding: 12px 18px; margin-bottom: 18px; font-size: 0.83rem; color: var(--muted); }
-  .perm-bar.visible { display: flex; }
-  .perm-bar-text { display: flex; align-items: center; gap: 8px; }
-  .btn-allow { background: var(--accent); border: none; border-radius: 8px; color: #fff; font-family: 'Syne', sans-serif; font-size: 0.78rem; font-weight: 600; padding: 7px 16px; cursor: pointer; flex-shrink: 0; transition: opacity 0.2s; }
-  .btn-allow:hover { opacity: 0.85; }
-  .btn-dismiss { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; padding: 4px; flex-shrink: 0; }
-  .btn-dismiss:hover { color: var(--text); }
-
-  /* ── Mobile ── */
-  @media (max-width: 480px) {
-    .form-grid { grid-template-columns: 1fr; }
-    .task-actions { opacity: 1; }
-    .cal-cell { min-height: 52px; }
+  /* Mobile */
+  @media (max-width:480px) {
+    .form-grid,.form-grid-3 { grid-template-columns:1fr; }
+    .task-actions { opacity:1; }
+    .cal-cell { min-height:52px; }
   }
 </style>
 </head>
 <body>
 
 <canvas id="confetti-canvas"></canvas>
-
-<!-- Hidden file inputs — outside any overflow:hidden container -->
 <input type="file" id="input-image" accept="image/*" style="display:none">
 <input type="file" id="edit-image"  accept="image/*" style="display:none">
 
 <div class="wrapper">
 
-  <!-- Header -->
   <header>
     <div class="logo">StudyFlow</div>
     <div class="tagline">Your personal academic task manager</div>
@@ -247,7 +242,6 @@
     </div>
   </header>
 
-  <!-- View Tabs -->
   <div class="view-tabs">
     <button class="view-tab active" onclick="switchView('tasks',this)">📋 Tasks</button>
     <button class="view-tab" onclick="switchView('calendar',this)">📅 Calendar</button>
@@ -256,12 +250,12 @@
   <!-- ══ TASK VIEW ══ -->
   <div id="task-view">
 
-    <!-- Notification Permission Bar -->
+    <!-- Notif bar -->
     <div class="perm-bar" id="perm-bar">
-      <span class="perm-bar-text">🔔 Enable notifications to get deadline alerts even when the app is closed.</span>
+      <span>🔔 Enable notifications to get deadline alerts even when the app is closed.</span>
       <div style="display:flex;gap:8px;flex-shrink:0">
         <button class="btn-allow" onclick="requestNotifPermission()">Enable</button>
-        <button class="btn-dismiss" onclick="dismissPermBar()" title="Dismiss">✕</button>
+        <button class="btn-dismiss" onclick="dismissPermBar()">✕</button>
       </div>
     </div>
 
@@ -277,298 +271,653 @@
       <div class="form-title">+ New Task</div>
       <div class="form-row">
         <input type="text" id="input-title" placeholder="Task title (e.g. Read Chapter 5)">
-    low: "#6affcb",
-};
-
-const priorityBg = {
-  high: "rgba(255,95,109,0.13)",
-  medium: "rgba(255,179,71,0.13)",
-  low: "rgba(106,255,203,0.1)",
-};
-
-export default function App() {
-  const [tasks, setTasks] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("studyflow_tasks") || "[]");
-    } catch { return []; }
-  });
-  const [filter, setFilter] = useState("all");
-  const [editTask, setEditTask] = useState(null);
-  const [toast, setToast] = useState("");
-  const [toastVisible, setToastVisible] = useState(false);
-  const [form, setForm] = useState({ title: "", subject: "", due: "", priority: "medium" });
-  const [editForm, setEditForm] = useState({});
-
-  // Persist to localStorage
-  useEffect(() => {
-    try { localStorage.setItem("studyflow_tasks", JSON.stringify(tasks)); } catch {}
-  }, [tasks]);
-
-  const showToast = useCallback((msg) => {
-    setToast(msg);
-    setToastVisible(true);
-    setTimeout(() => setToastVisible(false), 2800);
-  }, []);
-
-  function addTask() {
-    if (!form.title.trim()) { showToast("Please enter a task title 📝"); return; }
-    const task = { id: Date.now(), ...form, title: form.title.trim(), subject: form.subject.trim(), done: false };
-    setTasks(prev => [task, ...prev]);
-    setForm({ title: "", subject: "", due: "", priority: "medium" });
-    showToast("Task added! 🎉");
-    const diff = daysUntil(task.due);
-    if (diff !== null && diff <= WARN_DAYS && diff >= 0) {
-      setTimeout(() => showToast(`⚠️ Due ${diff === 0 ? "today" : diff === 1 ? "tomorrow" : `in ${diff} days`}!`), 1400);
-    }
-  }
-
-  function toggleDone(id) {
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t));
-    const task = tasks.find(t => t.id === id);
-    if (!task?.done) {
-      showToast("Nice work! ✅ Auto-removing in 2s…");
-      setTimeout(() => {
-        setTasks(prev => prev.filter(t => t.id !== id));
-      }, 2000);
-    }
-  }
-
-  function deleteTask(id) {
-    setTasks(prev => prev.filter(t => t.id !== id));
-    showToast("Task deleted 🗑");
-  }
-
-  function openEdit(task) {
-    setEditTask(task);
-    setEditForm({ title: task.title, subject: task.subject, due: task.due || "", priority: task.priority });
-  }
-
-  function saveEdit() {
-    if (!editForm.title?.trim()) { showToast("Title can't be empty"); return; }
-    setTasks(prev => prev.map(t => t.id === editTask.id ? { ...t, ...editForm, title: editForm.title.trim() } : t));
-    setEditTask(null);
-    showToast("Task updated ✏️");
-  }
-
-  const filtered = tasks.filter(t => {
-    if (filter === "pending") return !t.done;
-    if (filter === "done") return t.done;
-    if (filter === "urgent") return !t.done && daysUntil(t.due) !== null && daysUntil(t.due) <= WARN_DAYS;
-    if (filter === "high" || filter === "medium" || filter === "low") return t.priority === filter;
-    return true;
-  });
-
-  const urgentTasks = tasks.filter(t => !t.done && daysUntil(t.due) !== null && daysUntil(t.due) <= WARN_DAYS)
-    .sort((a, b) => new Date(a.due) - new Date(b.due));
-
-  const s = {
-    body: { fontFamily: "'DM Sans', sans-serif", background: "#0e0e12", minHeight: "100vh", color: "#e8e8f0", margin: 0 },
-    ambient: { position: "fixed", inset: 0, background: "radial-gradient(ellipse 60% 40% at 20% 10%, rgba(124,106,255,0.12) 0%, transparent 60%), radial-gradient(ellipse 50% 50% at 80% 80%, rgba(106,255,203,0.07) 0%, transparent 60%)", pointerEvents: "none", zIndex: 0 },
-    wrapper: { position: "relative", zIndex: 1, maxWidth: 640, margin: "0 auto", padding: "36px 16px 80px" },
-    logo: { fontFamily: "Syne, sans-serif", fontWeight: 800, fontSize: "1.8rem", letterSpacing: "-0.04em", background: "linear-gradient(135deg,#7c6aff,#ff6a9b)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", display: "inline-block", marginBottom: 4 },
-    tagline: { fontSize: "0.83rem", color: "#6b6b80", fontWeight: 300 },
-    statsBar: { display: "flex", gap: 10, marginTop: 18, flexWrap: "wrap" },
-    stat: { background: "#16161d", border: "1px solid #2a2a38", borderRadius: 12, padding: "9px 16px", fontSize: "0.78rem", color: "#6b6b80" },
-    statNum: { fontFamily: "Syne, sans-serif", fontSize: "1.1rem", fontWeight: 700, color: "#e8e8f0", display: "block", lineHeight: 1.2 },
-    statNumUrgent: { fontFamily: "Syne, sans-serif", fontSize: "1.1rem", fontWeight: 700, color: "#ffb347", display: "block", lineHeight: 1.2 },
-
-    banner: { background: "rgba(255,179,71,0.07)", border: "1px solid rgba(255,179,71,0.28)", borderRadius: 16, padding: "14px 18px", marginBottom: 18 },
-    bannerHeader: { display: "flex", alignItems: "center", gap: 8, fontFamily: "Syne,sans-serif", fontSize: "0.72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em", color: "#ffb347", marginBottom: 10 },
-    pulse: { width: 8, height: 8, background: "#ffb347", borderRadius: "50%", flexShrink: 0 },
-    bannerItem: { display: "flex", alignItems: "center", gap: 10, fontSize: "0.84rem", color: "#e8e8f0", marginBottom: 6 },
-
-    card: (urg, done) => ({
-      background: "#16161d",
-      border: `1px solid ${urg && !done ? (urg.color === "#ff5f6d" ? "rgba(255,95,109,0.35)" : "rgba(255,179,71,0.3)") : "#2a2a38"}`,
-      borderRadius: 16,
-      padding: "15px 16px",
-      display: "flex",
-      alignItems: "center",
-      gap: 12,
-      marginBottom: 10,
-      position: "relative",
-      overflow: "hidden",
-      opacity: done ? 0.6 : 1,
-      transition: "border-color 0.2s",
-    }),
-    stripe: (priority) => ({
-      position: "absolute", left: 0, top: 0, bottom: 0, width: 3,
-      background: priorityColors[priority], borderRadius: "16px 0 0 16px",
-    }),
-    check: (done) => ({
-      width: 22, height: 22, borderRadius: "50%",
-      border: `2px solid ${done ? "#6affcb" : "#2a2a38"}`,
-      background: done ? "#6affcb" : "transparent",
-      cursor: "pointer", flexShrink: 0,
-      display: "flex", alignItems: "center", justifyContent: "center",
-      fontSize: "0.72rem", fontWeight: 700, color: "#0e0e12",
-      transition: "all 0.2s",
-    }),
-    taskBody: { flex: 1, minWidth: 0 },
-    taskTitle: (done) => ({ fontSize: "0.93rem", fontWeight: 500, color: done ? "#6b6b80" : "#e8e8f0", textDecoration: done ? "line-through" : "none", marginBottom: 4, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }),
-    meta: { display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" },
-    tag: (bg, color) => ({ fontSize: "0.68rem", padding: "2px 8px", borderRadius: 20, fontWeight: 500, background: bg, color }),
-    actions: { display: "flex", gap: 6, flexShrink: 0 },
-    btnIcon: (hover) => ({ background: "#1e1e28", border: "1px solid #2a2a38", borderRadius: 8, color: "#6b6b80", cursor: "pointer", fontSize: "0.85rem", padding: "7px 10px", lineHeight: 1 }),
-
-    form: { background: "#16161d", border: "1px solid #2a2a38", borderRadius: 20, padding: 22, marginBottom: 24, position: "relative", overflow: "hidden" },
-    formBar: { position: "absolute", top: 0, left: 0, right: 0, height: 2, background: "linear-gradient(90deg,#7c6aff,#ff6a9b,#6affcb)" },
-    formLabel: { fontFamily: "Syne,sans-serif", fontSize: "0.72rem", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.12em", color: "#6b6b80", marginBottom: 14, display: "block" },
-    input: { background: "#1e1e28", border: "1px solid #2a2a38", borderRadius: 12, color: "#e8e8f0", fontFamily: "DM Sans, sans-serif", fontSize: "0.9rem", padding: "11px 14px", outline: "none", width: "100%", marginBottom: 10, colorScheme: "dark", boxSizing: "border-box" },
-    grid2: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 0 },
-    btnAdd: { width: "100%", padding: 13, background: "linear-gradient(135deg,#7c6aff,#9b6aff)", border: "none", borderRadius: 12, color: "#fff", fontFamily: "Syne,sans-serif", fontSize: "0.93rem", fontWeight: 600, cursor: "pointer", marginTop: 10 },
-
-    filters: { display: "flex", gap: 8, marginBottom: 18, flexWrap: "wrap" },
-    filterBtn: (active) => ({ background: active ? "rgba(124,106,255,0.1)" : "#16161d", border: `1px solid ${active ? "#7c6aff" : "#2a2a38"}`, borderRadius: 20, color: active ? "#7c6aff" : "#6b6b80", fontFamily: "DM Sans, sans-serif", fontSize: "0.78rem", padding: "6px 14px", cursor: "pointer" }),
-
-    sectionLabel: { fontFamily: "Syne,sans-serif", fontSize: "0.68rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em", color: "#6b6b80", marginBottom: 12 },
-    empty: { textAlign: "center", padding: "50px 20px", color: "#6b6b80" },
-
-    overlay: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", backdropFilter: "blur(6px)", zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 },
-    modal: { background: "#16161d", border: "1px solid #2a2a38", borderRadius: 24, padding: 26, width: "100%", maxWidth: 400 },
-    modalTitle: { fontFamily: "Syne,sans-serif", fontSize: "1.05rem", fontWeight: 700, marginBottom: 18, background: "linear-gradient(135deg,#7c6aff,#ff6a9b)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" },
-    modalActions: { display: "flex", gap: 10, marginTop: 4 },
-    btnSave: { flex: 1, padding: 12, background: "linear-gradient(135deg,#7c6aff,#9b6aff)", border: "none", borderRadius: 12, color: "#fff", fontFamily: "Syne,sans-serif", fontSize: "0.88rem", fontWeight: 600, cursor: "pointer" },
-    btnCancel: { padding: "12px 18px", background: "#1e1e28", border: "1px solid #2a2a38", borderRadius: 12, color: "#6b6b80", fontFamily: "DM Sans, sans-serif", fontSize: "0.88rem", cursor: "pointer" },
-
-    toast: (visible) => ({ position: "fixed", bottom: 28, left: "50%", transform: `translateX(-50%) translateY(${visible ? 0 : 70}px)`, background: "#1e1e28", border: "1px solid #2a2a38", borderRadius: 12, padding: "11px 22px", fontSize: "0.84rem", color: "#e8e8f0", zIndex: 200, transition: "transform 0.3s, opacity 0.3s", opacity: visible ? 1 : 0, whiteSpace: "nowrap", pointerEvents: "none" }),
-  };
-
-  const filterLabels = { all: "All Tasks", pending: "Pending Tasks", done: "Completed", urgent: "🔥 Due Soon", high: "High Priority", medium: "Medium Priority", low: "Low Priority" };
-
-  return (
-    <div style={s.body}>
-      <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
-      <div style={s.ambient} />
-
-      <div style={s.wrapper}>
-        {/* Header */}
-        <header style={{ marginBottom: 36 }}>
-          <div style={s.logo}>StudyFlow</div>
-          <div style={s.tagline}>Your personal academic task manager</div>
-          <div style={s.statsBar}>
-            <div style={s.stat}><span style={s.statNum}>{tasks.length}</span>Total</div>
-            <div style={s.stat}><span style={s.statNum}>{tasks.filter(t => !t.done).length}</span>Pending</div>
-            <div style={s.stat}><span style={s.statNum}>{tasks.filter(t => t.done).length}</span>Done</div>
-            <div style={s.stat}><span style={s.statNumUrgent}>{urgentTasks.length}</span>Due Soon</div>
-          </div>
-        </header>
-
-        {/* Deadline Banner */}
-        {urgentTasks.length > 0 && (
-          <div style={s.banner}>
-            <div style={s.bannerHeader}>
-              <div style={s.pulse} />
-              ⚠️ Upcoming Deadlines
-            </div>
-            {urgentTasks.map(t => {
-              const u = urgencyInfo(t.due);
-              return (
-                <div key={t.id} style={s.bannerItem}>
-                  <div style={{ width: 7, height: 7, borderRadius: "50%", background: u?.color, flexShrink: 0 }} />
-                  <span><strong>{t.title}</strong>{t.subject ? ` · ${t.subject}` : ""}</span>
-                  <span style={{ marginLeft: "auto", fontSize: "0.7rem", padding: "2px 9px", borderRadius: 20, background: u?.bg, color: u?.color, fontWeight: 600, flexShrink: 0 }}>{u?.label}</span>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Add Form */}
-        <div style={s.form}>
-          <div style={s.formBar} />
-          <span style={s.formLabel}>+ New Task</span>
-          <input style={s.input} placeholder="Task title (e.g. Read Chapter 5)" value={form.title}
-            onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-            onKeyDown={e => e.key === "Enter" && addTask()} />
-          <div style={s.grid2}>
-            <input style={{ ...s.input, marginBottom: 0 }} placeholder="Subject (e.g. Math)" value={form.subject}
-              onChange={e => setForm(f => ({ ...f, subject: e.target.value }))} />
-            <input style={{ ...s.input, marginBottom: 0 }} type="date" value={form.due}
-              onChange={e => setForm(f => ({ ...f, due: e.target.value }))} />
-          </div>
-          <select style={{ ...s.input, marginTop: 10 }} value={form.priority}
-            onChange={e => setForm(f => ({ ...f, priority: e.target.value }))}>
-            <option value="medium">⚡ Medium Priority</option>
-            <option value="high">🔴 High Priority</option>
-            <option value="low">🟢 Low Priority</option>
-          </select>
-          <button style={s.btnAdd} onClick={addTask}>Add Task</button>
-        </div>
-
-        {/* Filters */}
-        <div style={s.filters}>
-          {["all","pending","done","urgent","high","low"].map(f => (
-            <button key={f} style={s.filterBtn(filter === f)} onClick={() => setFilter(f)}>
-              {f === "all" ? "All" : f === "pending" ? "Pending" : f === "done" ? "Done" : f === "urgent" ? "🔥 Due Soon" : f === "high" ? "🔴 High" : "🟢 Low"}
-            </button>
-          ))}
-        </div>
-
-        <div style={s.sectionLabel}>{filterLabels[filter]}</div>
-
-        {/* Task List */}
-        {filtered.length === 0 ? (
-          <div style={s.empty}>
-            <div style={{ fontSize: "2.2rem", marginBottom: 10, opacity: 0.4 }}>📭</div>
-            <p style={{ fontSize: "0.88rem" }}>No tasks here yet.</p>
-          </div>
-        ) : filtered.map(task => {
-          const urg = urgencyInfo(task.due);
-          return (
-            <div key={task.id} style={s.card(urg, task.done)}>
-              <div style={s.stripe(task.priority)} />
-              <div style={s.check(task.done)} onClick={() => toggleDone(task.id)}>
-                {task.done && "✓"}
-              </div>
-              <div style={s.taskBody}>
-                <div style={s.taskTitle(task.done)}>{task.title}</div>
-                <div style={s.meta}>
-                  {task.subject && <span style={s.tag("rgba(124,106,255,0.15)", "#a89fff")}>{task.subject}</span>}
-                  {task.due && (
-                    <span style={s.tag(urg ? urg.bg : "rgba(255,106,155,0.12)", urg ? urg.color : "#ff8ab8")}>
-                      📅 {formatDate(task.due)}{urg ? ` · ${urg.label}` : ""}
-                    </span>
-                  )}
-                  <span style={s.tag(priorityBg[task.priority], priorityColors[task.priority])}>{task.priority}</span>
-                </div>
-              </div>
-              <div style={s.actions}>
-                <button style={s.btnIcon()} onClick={() => openEdit(task)}>✏️</button>
-                <button style={s.btnIcon()} onClick={() => deleteTask(task.id)}>🗑</button>
-              </div>
-            </div>
-          );
-        })}
+      </div>
+      <div class="form-grid">
+        <input type="text" id="input-subject" placeholder="Subject (e.g. Math)">
+        <input type="date" id="input-due">
+      </div>
+      <div class="form-grid">
+        <select id="input-priority">
+          <option value="high">🔴 High Priority</option>
+          <option value="medium" selected>⚡ Medium Priority</option>
+          <option value="low">🟢 Low Priority</option>
+        </select>
+        <select id="input-category">
+          <option value="">📁 No Category</option>
+          <option value="exam">📝 Exam</option>
+          <option value="project">💼 Project</option>
+          <option value="homework">📚 Homework</option>
+          <option value="other">🗂 Other</option>
+        </select>
       </div>
 
-      {/* Edit Modal */}
-      {editTask && (
-        <div style={s.overlay} onClick={e => e.target === e.currentTarget && setEditTask(null)}>
-          <div style={s.modal}>
-            <div style={s.modalTitle}>Edit Task</div>
-            <input style={s.input} placeholder="Task title" value={editForm.title || ""}
-              onChange={e => setEditForm(f => ({ ...f, title: e.target.value }))} />
-            <input style={s.input} placeholder="Subject" value={editForm.subject || ""}
-              onChange={e => setEditForm(f => ({ ...f, subject: e.target.value }))} />
-            <input style={s.input} type="date" value={editForm.due || ""}
-              onChange={e => setEditForm(f => ({ ...f, due: e.target.value }))} />
-            <select style={s.input} value={editForm.priority || "medium"}
-              onChange={e => setEditForm(f => ({ ...f, priority: e.target.value }))}>
-              <option value="medium">⚡ Medium Priority</option>
-              <option value="high">🔴 High Priority</option>
-              <option value="low">🟢 Low Priority</option>
-            </select>
-            <div style={s.modalActions}>
-              <button style={s.btnSave} onClick={saveEdit}>Save Changes</button>
-              <button style={s.btnCancel} onClick={() => setEditTask(null)}>Cancel</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <!-- Image Upload -->
+      <button type="button" class="img-upload-btn" id="add-img-btn" onclick="document.getElementById('input-image').click()">
+        <span>📷</span> <span id="add-img-label">Attach a photo of the task (optional)</span>
+      </button>
+      <div class="img-preview-wrap" id="add-preview-wrap">
+        <img id="add-img-preview" class="img-preview" src="" alt="Preview">
+        <button type="button" class="img-remove-btn" onclick="removeAddImage()">✕ Remove photo</button>
+      </div>
 
-      {/* Toast */}
-      <div style={s.toast(toastVisible)}>{toast}</div>
+      <button class="btn-add" onclick="addTask()">Add Task</button>
     </div>
-  );
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <button class="btn-export" onclick="exportPDF()">📄 Export PDF</button>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+      <button class="filter-btn" onclick="setFilter('pending',this)">Pending</button>
+      <button class="filter-btn" onclick="setFilter('done',this)">Done</button>
+      <button class="filter-btn" onclick="setFilter('urgent',this)">🔥 Due Soon</button>
+      <button class="filter-btn" onclick="setFilter('high',this)">🔴 High</button>
+      <button class="filter-btn" onclick="setFilter('medium',this)">⚡ Medium</button>
+      <button class="filter-btn" onclick="setFilter('low',this)">🟢 Low</button>
+      <button class="filter-btn" onclick="setFilter('exam',this)">📝 Exam</button>
+      <button class="filter-btn" onclick="setFilter('project',this)">💼 Project</button>
+      <button class="filter-btn" onclick="setFilter('homework',this)">📚 Homework</button>
+    </div>
+
+    <div class="section-label" id="section-label">All Tasks</div>
+    <div id="task-list"></div>
+
+  </div><!-- end task-view -->
+
+  <!-- ══ CALENDAR VIEW ══ -->
+  <div id="calendar-view">
+    <div class="cal-nav">
+      <button class="cal-arrow" onclick="changeMonth(-1)">‹</button>
+      <div class="cal-month" id="cal-month-label"></div>
+      <button class="cal-arrow" onclick="changeMonth(1)">›</button>
+    </div>
+    <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-day-detail" id="cal-day-detail">
+      <div class="cal-detail-title" id="cal-detail-title"></div>
+      <div id="cal-detail-list"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-title">Built With</div>
+    <div class="tech-grid">
+      <div class="tech-item">
+        <img class="tech-logo" width="40" height="40" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" alt="JavaScript">
+        <span class="tech-name">JavaScript</span>
+      </div>
+      <div class="tech-item">
+        <img class="tech-logo" width="40" height="40" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" alt="HTML5">
+        <span class="tech-name">HTML</span>
+      </div>
+      <div class="tech-item">
+        <img class="tech-logo" width="40" height="40" src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" alt="CSS3">
+        <span class="tech-name">CSS</span>
+      </div>
+    </div>
+    <div class="footer-tagline">StudyFlow · Built for students, by Marco</div>
+  </footer>
+
+</div><!-- end .wrapper -->
+
+<!-- Edit Modal -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <div class="modal-title">Edit Task</div>
+    <input type="text" id="edit-title"   placeholder="Task title">
+    <input type="text" id="edit-subject" placeholder="Subject">
+    <input type="date" id="edit-due">
+    <select id="edit-priority">
+      <option value="high">🔴 High Priority</option>
+      <option value="medium">⚡ Medium Priority</option>
+      <option value="low">🟢 Low Priority</option>
+    </select>
+    <select id="edit-category">
+      <option value="">📁 No Category</option>
+      <option value="exam">📝 Exam</option>
+      <option value="project">💼 Project</option>
+      <option value="homework">📚 Homework</option>
+      <option value="other">🗂 Other</option>
+    </select>
+    <button type="button" class="img-upload-btn" id="edit-img-btn" onclick="document.getElementById('edit-image').click()">
+      <span>📷</span> <span id="edit-img-label">Change or add photo</span>
+    </button>
+    <div class="img-preview-wrap" id="edit-preview-wrap">
+      <img id="edit-img-preview" class="img-preview" src="" alt="">
+      <button type="button" class="img-remove-btn" onclick="removeEditImage()">✕ Remove photo</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-save"   onclick="saveEdit()">Save Changes</button>
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Share Modal -->
+<div class="modal-backdrop" id="share-modal">
+  <div class="modal">
+    <div class="modal-title">Share Task 🔗</div>
+    <div class="share-box" id="share-text"></div>
+    <div class="share-btns">
+      <button class="btn-share-copy" onclick="copyShareText()">📋 Copy to Clipboard</button>
+      <button class="btn-cancel" onclick="closeShareModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+  <img id="lightbox-img" src="" alt="">
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── State ──────────────────────────────────────────────────
+let tasks         = JSON.parse(localStorage.getItem('studyflow') || '[]');
+let currentFilter = 'all';
+let editingId     = null;
+let addImageData  = null;
+let editImageData = null;
+let shareTaskId   = null;
+let calYear, calMonth;
+const WARN_DAYS   = 2;
+
+const CAT_ICONS  = { exam:'📝', project:'💼', homework:'📚', other:'🗂' };
+const CAT_LABELS = { exam:'Exam', project:'Project', homework:'Homework', other:'Other' };
+
+const now = new Date();
+calYear  = now.getFullYear();
+calMonth = now.getMonth();
+
+// ── File Inputs ─────────────────────────────────────────────
+document.getElementById('input-image').addEventListener('change', function() {
+  const file = this.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    addImageData = e.target.result;
+    document.getElementById('add-img-preview').src = addImageData;
+    document.getElementById('add-preview-wrap').classList.add('visible');
+    document.getElementById('add-img-btn').classList.add('has-image');
+    document.getElementById('add-img-label').textContent = '✓ Photo attached — click to change';
+  };
+  reader.readAsDataURL(file);
+});
+
+document.getElementById('edit-image').addEventListener('change', function() {
+  const file = this.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    editImageData = e.target.result;
+    document.getElementById('edit-img-preview').src = editImageData;
+    document.getElementById('edit-preview-wrap').classList.add('visible');
+    document.getElementById('edit-img-btn').classList.add('has-image');
+    document.getElementById('edit-img-label').textContent = '✓ Photo attached — click to change';
+  };
+  reader.readAsDataURL(file);
+});
+
+function removeAddImage() {
+  addImageData = null;
+  document.getElementById('input-image').value = '';
+  document.getElementById('add-preview-wrap').classList.remove('visible');
+  document.getElementById('add-img-btn').classList.remove('has-image');
+  document.getElementById('add-img-label').textContent = 'Attach a photo of the task (optional)';
 }
+
+function removeEditImage() {
+  editImageData = null;
+  document.getElementById('edit-image').value = '';
+  document.getElementById('edit-preview-wrap').classList.remove('visible');
+  document.getElementById('edit-img-btn').classList.remove('has-image');
+  document.getElementById('edit-img-label').textContent = 'Change or add photo';
+}
+
+// ── Date Helpers ────────────────────────────────────────────
+function todayDate() { const d = new Date(); d.setHours(0,0,0,0); return d; }
+function daysUntil(str) { if (!str) return null; const d = new Date(str); d.setHours(0,0,0,0); return Math.round((d - todayDate()) / 86400000); }
+function formatDate(str) { if (!str) return ''; return new Date(str).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'}); }
+function urgencyInfo(str) {
+  const diff = daysUntil(str);
+  if (diff === null) return null;
+  if (diff < 0)   return {cls:'overdue',  label:'Overdue',   color:'#ff5f6d', bg:'rgba(255,95,109,0.2)'};
+  if (diff === 0) return {cls:'today',    label:'Due Today', color:'#ff5f6d', bg:'rgba(255,95,109,0.2)'};
+  if (diff === 1) return {cls:'tomorrow', label:'Tomorrow',  color:'#ffb347', bg:'rgba(255,179,71,0.18)'};
+  if (diff <= WARN_DAYS) return {cls:'soon', label:`${diff} days`, color:'#ffd580', bg:'rgba(255,213,128,0.15)'};
+  return null;
+}
+
+// ── Persistence ─────────────────────────────────────────────
+function save() { localStorage.setItem('studyflow', JSON.stringify(tasks)); render(); updateStats(); updateBanner(); renderCalendar(); }
+
+// ── CRUD ────────────────────────────────────────────────────
+function addTask() {
+  const title = document.getElementById('input-title').value.trim();
+  if (!title) { showToast('Please enter a task title 📝'); return; }
+  const task = {
+    id:       Date.now(),
+    title,
+    subject:  document.getElementById('input-subject').value.trim(),
+    due:      document.getElementById('input-due').value,
+    priority: document.getElementById('input-priority').value,
+    category: document.getElementById('input-category').value,
+    image:    addImageData || null,
+    done:     false
+  };
+  tasks.unshift(task);
+  save();
+  document.getElementById('input-title').value    = '';
+  document.getElementById('input-subject').value  = '';
+  document.getElementById('input-due').value      = '';
+  document.getElementById('input-priority').value = 'medium';
+  document.getElementById('input-category').value = '';
+  removeAddImage();
+  showToast('Task added! 🎉');
+  const diff = daysUntil(task.due);
+  if (diff !== null && diff >= 0 && diff <= WARN_DAYS)
+    setTimeout(() => showToast(`⚠️ Due ${diff===0?'today':diff===1?'tomorrow':'in '+diff+' days'}!`), 1400);
+}
+
+function toggleDone(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  task.done = !task.done;
+  save();
+  if (task.done) {
+    launchConfetti();
+    showToast('Awesome! Task completed 🎉');
+    setTimeout(() => {
+      const card = document.querySelector(`[data-id="${id}"]`);
+      if (card) { card.classList.add('removing'); setTimeout(() => { tasks = tasks.filter(t => t.id !== id); save(); }, 300); }
+    }, 2200);
+  }
+}
+
+function deleteTask(id) {
+  const card = document.querySelector(`[data-id="${id}"]`);
+  if (card) { card.classList.add('removing'); setTimeout(() => { tasks = tasks.filter(t => t.id !== id); save(); }, 300); }
+}
+
+function openEdit(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  editingId = id; editImageData = task.image || null;
+  document.getElementById('edit-title').value    = task.title;
+  document.getElementById('edit-subject').value  = task.subject;
+  document.getElementById('edit-due').value      = task.due || '';
+  document.getElementById('edit-priority').value = task.priority;
+  document.getElementById('edit-category').value = task.category || '';
+  if (task.image) {
+    document.getElementById('edit-img-preview').src = task.image;
+    document.getElementById('edit-preview-wrap').classList.add('visible');
+    document.getElementById('edit-img-btn').classList.add('has-image');
+    document.getElementById('edit-img-label').textContent = '✓ Photo attached — click to change';
+  } else {
+    document.getElementById('edit-preview-wrap').classList.remove('visible');
+    document.getElementById('edit-img-btn').classList.remove('has-image');
+    document.getElementById('edit-img-label').textContent = 'Change or add photo';
+  }
+  document.getElementById('modal').classList.add('open');
+}
+
+function saveEdit() {
+  const task = tasks.find(t => t.id === editingId);
+  if (!task) return;
+  const title = document.getElementById('edit-title').value.trim();
+  if (!title) { showToast("Title can't be empty"); return; }
+  task.title    = title;
+  task.subject  = document.getElementById('edit-subject').value.trim();
+  task.due      = document.getElementById('edit-due').value;
+  task.priority = document.getElementById('edit-priority').value;
+  task.category = document.getElementById('edit-category').value;
+  task.image    = editImageData;
+  closeModal(); save();
+  showToast('Task updated ✏️');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  editingId = null; editImageData = null;
+}
+
+// ── Share Task ──────────────────────────────────────────────
+function openShare(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  shareTaskId = id;
+  const catLine = task.category ? `Category : ${CAT_ICONS[task.category] || ''} ${CAT_LABELS[task.category] || task.category}\n` : '';
+  const subLine = task.subject  ? `Subject  : ${task.subject}\n` : '';
+  const dueLine = task.due      ? `Due Date : ${formatDate(task.due)}\n` : '';
+  const priLine = `Priority : ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)}\n`;
+  const statusLine = `Status   : ${task.done ? '✅ Completed' : '🔲 Pending'}`;
+  const text = `📋 StudyFlow Task\n${'─'.repeat(30)}\n${task.title}\n${'─'.repeat(30)}\n${subLine}${catLine}${dueLine}${priLine}${statusLine}\n\n— Shared from StudyFlow by Marco`;
+  document.getElementById('share-text').textContent = text;
+  document.getElementById('share-modal').classList.add('open');
+}
+
+function copyShareText() {
+  const text = document.getElementById('share-text').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('Copied to clipboard! 📋');
+    closeShareModal();
+  }).catch(() => {
+    // Fallback for older browsers
+    const el = document.createElement('textarea');
+    el.value = text;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    showToast('Copied to clipboard! 📋');
+    closeShareModal();
+  });
+}
+
+function closeShareModal() {
+  document.getElementById('share-modal').classList.remove('open');
+  shareTaskId = null;
+}
+
+// ── Export PDF ──────────────────────────────────────────────
+function exportPDF() {
+  const pending  = tasks.filter(t => !t.done);
+  const done     = tasks.filter(t => t.done);
+  const dateStr  = new Date().toLocaleDateString('en-US', {month:'long', day:'numeric', year:'numeric'});
+
+  const catColor = { exam:'#ff5f6d', project:'#7c6aff', homework:'#6affcb', other:'#ffb347' };
+  const prioColor= { high:'#ff5f6d', medium:'#ffb347', low:'#6affcb' };
+
+  function taskRow(t) {
+    const u   = urgencyInfo(t.due);
+    const cat = t.category ? `<span style="background:${catColor[t.category]}22;color:${catColor[t.category]};padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;margin-right:4px">${CAT_ICONS[t.category]} ${CAT_LABELS[t.category]}</span>` : '';
+    const due = t.due ? `<span style="color:${u?u.color:'#888'};font-size:11px;margin-right:4px">📅 ${formatDate(t.due)}${u?' · '+u.label:''}</span>` : '';
+    const sub = t.subject ? `<span style="color:#888;font-size:11px;margin-right:4px">${t.subject}</span>` : '';
+    const prio= `<span style="background:${prioColor[t.priority]}22;color:${prioColor[t.priority]};padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600">${t.priority}</span>`;
+    return `<tr style="border-bottom:1px solid #f0f0f0">
+      <td style="padding:10px 8px;vertical-align:top">
+        <div style="font-weight:600;font-size:14px;color:#1a1a2e;margin-bottom:4px${t.done?';text-decoration:line-through;color:#999':''}">${t.title}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center">${sub}${cat}${due}${prio}</div>
+      </td>
+      <td style="padding:10px 8px;text-align:center;font-size:18px">${t.done?'✅':'🔲'}</td>
+    </tr>`;
+  }
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; color:#1a1a2e; margin:0; padding:40px; background:#fff; }
+    h1 { font-size:28px; font-weight:800; margin:0; color:#1a1a2e; letter-spacing:-0.03em; }
+    .subtitle { color:#888; font-size:13px; margin-top:4px; }
+    .accent { background:linear-gradient(135deg,#7c6aff,#ff6a9b); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+    .section-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#888; margin:28px 0 10px; }
+    table { width:100%; border-collapse:collapse; }
+    .stats { display:flex; gap:16px; margin:20px 0; }
+    .stat-box { background:#f7f7fb; border-radius:12px; padding:12px 20px; flex:1; text-align:center; }
+    .stat-box .num { font-size:22px; font-weight:800; color:#1a1a2e; }
+    .stat-box .lbl { font-size:11px; color:#888; margin-top:2px; }
+    .divider { border:none; border-top:2px solid #f0f0f0; margin:8px 0; }
+    .footer { margin-top:40px; padding-top:16px; border-top:1px solid #eee; font-size:11px; color:#bbb; text-align:center; }
+  </style></head><body>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+    <div>
+      <h1><span class="accent">StudyFlow</span></h1>
+      <div class="subtitle">Task Report · ${dateStr}</div>
+    </div>
+    <div style="font-size:36px">📋</div>
+  </div>
+  <hr class="divider">
+  <div class="stats">
+    <div class="stat-box"><div class="num">${tasks.length}</div><div class="lbl">Total</div></div>
+    <div class="stat-box"><div class="num" style="color:#7c6aff">${pending.length}</div><div class="lbl">Pending</div></div>
+    <div class="stat-box"><div class="num" style="color:#6affcb">${done.length}</div><div class="lbl">Completed</div></div>
+    <div class="stat-box"><div class="num" style="color:#ffb347">${tasks.filter(t=>!t.done&&daysUntil(t.due)!==null&&daysUntil(t.due)<=WARN_DAYS).length}</div><div class="lbl">Due Soon</div></div>
+  </div>
+  ${pending.length ? `<div class="section-title">📌 Pending Tasks (${pending.length})</div><table>${pending.map(taskRow).join('')}</table>` : ''}
+  ${done.length    ? `<div class="section-title">✅ Completed Tasks (${done.length})</div><table>${done.map(taskRow).join('')}</table>` : ''}
+  <div class="footer">StudyFlow · Built for students, by Marco · Exported ${dateStr}</div>
+  </body></html>`;
+
+  const win = window.open('', '_blank');
+  if (!win) { showToast('Allow popups to export PDF'); return; }
+  win.document.write(html);
+  win.document.close();
+  setTimeout(() => { win.focus(); win.print(); }, 500);
+}
+
+// ── Lightbox ────────────────────────────────────────────────
+function openLightbox(src) { document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').classList.add('open'); }
+function closeLightbox()    { document.getElementById('lightbox').classList.remove('open'); }
+
+// ── View Switch ─────────────────────────────────────────────
+function switchView(view, btn) {
+  document.querySelectorAll('.view-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (view === 'calendar') {
+    document.getElementById('task-view').classList.add('hidden');
+    document.getElementById('calendar-view').classList.add('visible');
+    renderCalendar();
+  } else {
+    document.getElementById('task-view').classList.remove('hidden');
+    document.getElementById('calendar-view').classList.remove('visible');
+  }
+}
+
+// ── Filter ──────────────────────────────────────────────────
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const labels = {all:'All Tasks',pending:'Pending Tasks',done:'Completed',urgent:'🔥 Due Soon',high:'High Priority',medium:'Medium Priority',low:'Low Priority',exam:'📝 Exam',project:'💼 Project',homework:'📚 Homework'};
+  document.getElementById('section-label').textContent = labels[f] || f;
+  render();
+}
+
+function getFiltered() {
+  let list = tasks;
+  if (currentFilter === 'pending') list = list.filter(t => !t.done);
+  else if (currentFilter === 'done')    list = list.filter(t => t.done);
+  else if (currentFilter === 'urgent')  list = list.filter(t => !t.done && daysUntil(t.due) !== null && daysUntil(t.due) <= WARN_DAYS);
+  else if (['high','medium','low'].includes(currentFilter)) list = list.filter(t => t.priority === currentFilter);
+  else if (['exam','project','homework','other'].includes(currentFilter)) list = list.filter(t => t.category === currentFilter);
+  return list;
+}
+
+// ── Render ───────────────────────────────────────────────────
+function render() {
+  const list     = document.getElementById('task-list');
+  const filtered = getFiltered();
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><p style="font-size:.88rem">No tasks here yet.</p></div>`;
+    return;
+  }
+  list.innerHTML = filtered.map(task => {
+    const u = urgencyInfo(task.due);
+    const cardCls = u && !task.done ? (u.cls==='overdue'||u.cls==='today'?'urgent-today':'urgent-soon') : '';
+    const dueStyle = u ? `background:${u.bg};color:${u.color};font-weight:600` : '';
+    const dueLabel = task.due ? `📅 ${formatDate(task.due)}${u?' · '+u.label:''}` : '';
+    const catTag   = task.category ? `<span class="tag tag-cat-${task.category}">${CAT_ICONS[task.category]} ${CAT_LABELS[task.category]}</span>` : '';
+    const imgHtml  = task.image ? `<div class="task-thumb-wrap" onclick="openLightbox('${task.image.replace(/'/g,"\\'")}')"><img class="task-thumb" src="${task.image}" alt="Task photo"></div>` : '';
+    return `
+    <div class="task-card ${task.done?'done':''} ${cardCls}" data-id="${task.id}" data-priority="${task.priority}">
+      <div class="task-check ${task.done?'checked':''}" onclick="toggleDone(${task.id})">${task.done?'✓':''}</div>
+      <div class="task-body">
+        <div class="task-title">${esc(task.title)}</div>
+        <div class="task-meta">
+          ${task.subject ? `<span class="tag tag-subject">${esc(task.subject)}</span>` : ''}
+          ${catTag}
+          ${task.due ? `<span class="tag tag-due ${u?u.cls:''}" style="${dueStyle}">${dueLabel}</span>` : ''}
+          <span class="tag tag-prio-${task.priority}">${task.priority}</span>
+        </div>
+        ${imgHtml}
+      </div>
+      <div class="task-actions">
+        <button class="btn-icon share"  onclick="openShare(${task.id})" title="Share">🔗</button>
+        <button class="btn-icon edit"   onclick="openEdit(${task.id})"  title="Edit">✏️</button>
+        <button class="btn-icon delete" onclick="deleteTask(${task.id})" title="Delete">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Stats ────────────────────────────────────────────────────
+function updateStats() {
+  const urgent = tasks.filter(t => !t.done && daysUntil(t.due) !== null && daysUntil(t.due) <= WARN_DAYS);
+  document.getElementById('stat-total').textContent   = tasks.length;
+  document.getElementById('stat-pending').textContent = tasks.filter(t => !t.done).length;
+  document.getElementById('stat-done').textContent    = tasks.filter(t => t.done).length;
+  document.getElementById('stat-urgent').textContent  = urgent.length;
+}
+
+// ── Deadline Banner ───────────────────────────────────────────
+function updateBanner() {
+  const urgent = tasks.filter(t => !t.done && daysUntil(t.due) !== null && daysUntil(t.due) <= WARN_DAYS)
+                      .sort((a,b) => new Date(a.due) - new Date(b.due));
+  const banner = document.getElementById('notif-banner');
+  const items  = document.getElementById('notif-items');
+  if (!urgent.length) { banner.classList.remove('visible'); return; }
+  items.innerHTML = urgent.map(t => {
+    const u = urgencyInfo(t.due);
+    return `<div class="notif-item">
+      <div class="notif-dot" style="background:${u.color}"></div>
+      <span><strong>${esc(t.title)}</strong>${t.subject?' · '+esc(t.subject):''}</span>
+      <span class="notif-label" style="background:${u.bg};color:${u.color}">${u.label}</span>
+    </div>`;
+  }).join('');
+  banner.classList.add('visible');
+}
+
+// ── Calendar ──────────────────────────────────────────────────
+function renderCalendar() {
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('cal-month-label').textContent = `${MONTHS[calMonth]} ${calYear}`;
+  const grid  = document.getElementById('cal-grid');
+  const today = todayDate();
+  const DAYS  = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  let html = DAYS.map(d => `<div class="cal-day-header">${d}</div>`).join('');
+  const firstDay    = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const daysInPrev  = new Date(calYear, calMonth, 0).getDate();
+  for (let i = firstDay - 1; i >= 0; i--)
+    html += `<div class="cal-cell other-month"><div class="cal-date">${daysInPrev - i}</div></div>`;
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr  = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const cellDate = new Date(calYear, calMonth, d);
+    const isToday  = cellDate.getTime() === today.getTime();
+    const dayTasks = tasks.filter(t => t.due === dateStr && !t.done);
+    const dots     = dayTasks.map(t => `<div class="cal-dot" style="background:${t.priority==='high'?'#ff5f6d':t.priority==='medium'?'#ffb347':'#6affcb'}"></div>`).join('');
+    html += `<div class="cal-cell ${isToday?'today':''} ${dayTasks.length?'has-tasks':''}" onclick="showDayDetail('${dateStr}','${d} ${MONTHS[calMonth]}')">
+      <div class="cal-date">${d}</div><div class="cal-dot-wrap">${dots}</div></div>`;
+  }
+  const remaining = (firstDay + daysInMonth) % 7;
+  for (let i = 1; i <= (remaining===0?0:7-remaining); i++)
+    html += `<div class="cal-cell other-month"><div class="cal-date">${i}</div></div>`;
+  grid.innerHTML = html;
+}
+
+function showDayDetail(dateStr, label) {
+  const detail   = document.getElementById('cal-day-detail');
+  const dayTasks = tasks.filter(t => t.due === dateStr);
+  document.getElementById('cal-detail-title').textContent = label;
+  document.getElementById('cal-detail-list').innerHTML = !dayTasks.length
+    ? `<p style="color:var(--muted);font-size:.84rem;padding:8px 0">No tasks on this day.</p>`
+    : dayTasks.map(t => `
+      <div class="cal-task-row">
+        <div style="width:8px;height:8px;border-radius:50%;background:${t.priority==='high'?'#ff5f6d':t.priority==='medium'?'#ffb347':'#6affcb'};flex-shrink:0"></div>
+        <span style="${t.done?'text-decoration:line-through;color:var(--muted)':''}">${esc(t.title)}</span>
+        ${t.category?`<span style="margin-left:auto;font-size:0.75rem">${CAT_ICONS[t.category]} ${CAT_LABELS[t.category]}</span>`:''}
+        ${t.done?'<span style="color:var(--accent3);font-size:0.8rem">✓</span>':''}
+      </div>`).join('');
+  detail.classList.add('visible');
+}
+
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  if (calMonth < 0)  { calMonth = 11; calYear--; }
+  document.getElementById('cal-day-detail').classList.remove('visible');
+  renderCalendar();
+}
+
+// ── Confetti ──────────────────────────────────────────────────
+function launchConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx    = canvas.getContext('2d');
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  const colors = ['#7c6aff','#ff6a9b','#6affcb','#ffb347','#ff5f6d','#ffffff'];
+  const pieces = Array.from({length:130}, () => ({
+    x:Math.random()*canvas.width, y:Math.random()*-canvas.height*0.5,
+    w:6+Math.random()*8, h:10+Math.random()*6,
+    color:colors[Math.floor(Math.random()*colors.length)],
+    rot:Math.random()*360, vx:(Math.random()-0.5)*3,
+    vy:2+Math.random()*4, vr:(Math.random()-0.5)*6,
+  }));
+  let frame, start = null;
+  const duration = 3000;
+  function animate(ts) {
+    if (!start) start = ts;
+    const elapsed = ts - start;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pieces.forEach(p => {
+      p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+      ctx.save(); ctx.globalAlpha = Math.max(0, 1-elapsed/duration);
+      ctx.translate(p.x+p.w/2, p.y+p.h/2); ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.color; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore();
+    });
+    if (elapsed < duration) frame = requestAnimationFrame(animate);
+    else ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+  cancelAnimationFrame(frame); requestAnimationFrame(animate);
+}
+
+// ── Push Notifications ────────────────────────────────────────
+function initNotifBar() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'granted') scheduleNotifCheck();
+  else if (Notification.permission === 'default') document.getElementById('perm-bar').classList.add('visible');
+}
+function requestNotifPermission() {
+  if (!('Notification' in window)) { showToast('Browser does not support notifications'); return; }
+  Notification.requestPermission().then(perm => {
+    document.getElementById('perm-bar').classList.remove('visible');
+    if (perm === 'granted') { showToast('Notifications enabled! 🔔'); sendPushNotifications(); scheduleNotifCheck(); }
+    else showToast('Notifications blocked. Enable in browser settings.');
+  });
+}
+function dismissPermBar() { document.getElementById('perm-bar').classList.remove('visible'); }
+function sendPushNotifications() {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  tasks.filter(t => !t.done && daysUntil(t.due) !== null && daysUntil(t.due) <= WARN_DAYS).forEach((t, i) => {
+    setTimeout(() => {
+      const diff = daysUntil(t.due);
+      const when = diff < 0 ? 'is OVERDUE' : diff === 0 ? 'is due TODAY' : diff === 1 ? 'is due tomorrow' : `is due in ${diff} days`;
+      try { new Notification('⚠️ StudyFlow Deadline', { body:`"${t.title}" ${when}`, tag:`studyflow-${t.id}` }); } catch(e) {}
+    }, i * 800);
+  });
+}
+function scheduleNotifCheck() { setInterval(sendPushNotifications, 30*60*1000); }
+
+// ── Toast ─────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// ── Helpers ───────────────────────────────────────────────────
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── Events ────────────────────────────────────────────────────
+document.getElementById('modal').addEventListener('click', e => { if (e.target===e.currentTarget) closeModal(); });
+document.getElementById('share-modal').addEventListener('click', e => { if (e.target===e.currentTarget) closeShareModal(); });
+document.getElementById('input-title').addEventListener('keydown', e => { if (e.key==='Enter') addTask(); });
+
+// ── Init ──────────────────────────────────────────────────────
+render(); updateStats(); updateBanner(); initNotifBar();
+</script>
+</body>
+</html>
