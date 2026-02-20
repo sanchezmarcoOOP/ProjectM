@@ -1,40 +1,283 @@
-import { useState, useEffect, useCallback } from "react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyFlow — Task Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-const WARN_DAYS = 2;
+  :root {
+    --bg: #0e0e12; --surface: #16161d; --surface2: #1e1e28; --border: #2a2a38;
+    --accent: #7c6aff; --accent2: #ff6a9b; --accent3: #6affcb;
+    --text: #e8e8f0; --muted: #6b6b80; --danger: #ff5f6d; --warn: #ffb347;
+  }
 
-function today() {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-function daysUntil(dateStr) {
-  if (!dateStr) return null;
-  const due = new Date(dateStr);
-  due.setHours(0, 0, 0, 0);
-  return Math.round((due - today()) / 86400000);
-}
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse 60% 40% at 20% 10%, rgba(124,106,255,0.12) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 50% at 80% 80%, rgba(106,255,203,0.07) 0%, transparent 60%);
+  }
 
-function formatDate(dateStr) {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-}
+  .wrapper { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; padding: 48px 20px 0; }
 
-function urgencyInfo(dateStr) {
-  const diff = daysUntil(dateStr);
-  if (diff === null) return null;
-  if (diff < 0) return { label: "Overdue", color: "#ff5f6d", bg: "rgba(255,95,109,0.18)" };
-  if (diff === 0) return { label: "Due Today", color: "#ff5f6d", bg: "rgba(255,95,109,0.18)" };
-  if (diff === 1) return { label: "Tomorrow", color: "#ffb347", bg: "rgba(255,179,71,0.18)" };
-  if (diff <= WARN_DAYS) return { label: `${diff} days`, color: "#ffd580", bg: "rgba(255,213,128,0.15)" };
-  return null;
-}
+  /* ── Header ── */
+  header { margin-bottom: 32px; }
+  .logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.9rem; letter-spacing: -0.04em; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; display: inline-block; margin-bottom: 4px; }
+  .tagline { font-size: 0.84rem; color: var(--muted); font-weight: 300; }
+  .stats-bar { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 9px 16px; font-size: 0.78rem; color: var(--muted); }
+  .stat span { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--text); display: block; line-height: 1.2; }
+  .stat.urgent span { color: var(--warn); }
 
-const priorityColors = {
-  high: "#ff5f6d",
-  medium: "#ffb347",
-  low: "#6affcb",
+  /* ── View Tabs ── */
+  .view-tabs { display: flex; gap: 8px; margin-top: 24px; margin-bottom: 20px; }
+  .view-tab { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.82rem; padding: 8px 18px; cursor: pointer; transition: all 0.2s; }
+  .view-tab.active { background: rgba(124,106,255,0.12); border-color: var(--accent); color: var(--accent); font-weight: 500; }
+
+  /* ── Deadline Banner ── */
+  .notif-banner { background: rgba(255,179,71,0.07); border: 1px solid rgba(255,179,71,0.28); border-radius: 16px; padding: 14px 18px; margin-bottom: 20px; display: none; }
+  .notif-banner.visible { display: block; }
+  .notif-header { display: flex; align-items: center; gap: 8px; font-family: 'Syne', sans-serif; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--warn); margin-bottom: 10px; }
+  .notif-pulse { width: 8px; height: 8px; background: var(--warn); border-radius: 50%; animation: pulse 1.5s infinite; flex-shrink: 0; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+  .notif-item { display: flex; align-items: center; gap: 10px; font-size: 0.84rem; color: var(--text); margin-bottom: 6px; }
+  .notif-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .notif-label { margin-left: auto; font-size: 0.7rem; padding: 2px 9px; border-radius: 20px; font-weight: 600; flex-shrink: 0; }
+
+  /* ── Add Form ── */
+  .add-form { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 22px; margin-bottom: 24px; position: relative; }
+  .add-form-bar { position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent), var(--accent2), var(--accent3)); border-radius: 20px 20px 0 0; }
+  .form-title { font-family: 'Syne', sans-serif; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 14px; margin-top: 4px; }
+  .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
+
+  input[type="text"], input[type="date"], select {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; padding: 11px 14px; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s; flex: 1; width: 100%; color-scheme: dark;
+  }
+  input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,106,255,0.15); }
+  select option { background: var(--surface2); }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+
+  /* ── Image Upload (fixed) ── */
+  /* Hidden real file input, triggered by JS */
+  #input-image, #edit-image { display: none; }
+
+  .img-upload-btn {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface2); border: 1.5px dashed var(--border);
+    border-radius: 12px; padding: 11px 14px;
+    cursor: pointer; color: var(--muted); font-size: 0.88rem;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+    margin-bottom: 10px; width: 100%; text-align: left;
+  }
+  .img-upload-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(124,106,255,0.05); }
+  .img-upload-btn.has-image { border-color: var(--accent3); color: var(--accent3); border-style: solid; }
+
+  .img-preview-wrap { display: none; position: relative; margin-bottom: 10px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+  .img-preview-wrap.visible { display: block; }
+  .img-preview { width: 100%; max-height: 180px; object-fit: cover; display: block; cursor: pointer; }
+  .img-remove-btn { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.75); border: none; border-radius: 8px; color: #fff; cursor: pointer; font-size: 0.78rem; padding: 5px 10px; font-family: 'DM Sans', sans-serif; }
+  .img-remove-btn:hover { background: var(--danger); }
+
+  .btn-add { width: 100%; padding: 13px; background: linear-gradient(135deg, var(--accent), #9b6aff); border: none; border-radius: 12px; color: #fff; font-family: 'Syne', sans-serif; font-size: 0.93rem; font-weight: 600; cursor: pointer; margin-top: 10px; transition: opacity 0.2s, transform 0.15s; }
+  .btn-add:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-add:active { transform: translateY(0); }
+
+  /* ── Filters ── */
+  .filters { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+  .filter-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.78rem; padding: 6px 14px; cursor: pointer; transition: all 0.2s; }
+  .filter-btn.active, .filter-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(124,106,255,0.08); }
+  .section-label { font-family: 'Syne', sans-serif; font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); margin-bottom: 12px; }
+
+  /* ── Task Cards ── */
+  #task-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .task-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 15px 16px; display: flex; align-items: flex-start; gap: 12px; position: relative; animation: slideIn 0.3s cubic-bezier(0.34,1.56,0.64,1); transition: border-color 0.2s, transform 0.2s; }
+  .task-card:hover { transform: translateY(-1px); border-color: #3a3a50; }
+  .task-card.urgent-today { border-color: rgba(255,95,109,0.35); }
+  .task-card.urgent-soon  { border-color: rgba(255,179,71,0.3); }
+  .task-card.done         { opacity: 0.6; }
+
+  @keyframes slideIn { from{opacity:0;transform:translateY(10px) scale(.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+  @keyframes fadeOut { to{opacity:0;transform:scale(.95);max-height:0;padding:0;margin:0;border:none} }
+  .task-card.removing { animation: fadeOut 0.3s ease forwards; pointer-events: none; }
+
+  .task-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; border-radius:16px 0 0 16px; }
+  .task-card[data-priority="high"]::before   { background: var(--danger); }
+  .task-card[data-priority="medium"]::before { background: var(--warn); }
+  .task-card[data-priority="low"]::before    { background: var(--accent3); }
+
+  .task-check { width:22px; height:22px; border:2px solid var(--border); border-radius:50%; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:0.72rem; font-weight:700; color:#0e0e12; transition:all 0.2s; margin-top:1px; }
+  .task-check:hover   { border-color: var(--accent3); }
+  .task-check.checked { background: var(--accent3); border-color: var(--accent3); }
+
+  .task-body { flex: 1; min-width: 0; }
+  .task-title { font-size: 0.93rem; font-weight: 500; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .task-card.done .task-title { text-decoration: line-through; color: var(--muted); }
+  .task-meta { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+  .tag { font-size: 0.68rem; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+  .tag-subject  { background: rgba(124,106,255,0.15); color: #a89fff; }
+  .tag-due      { background: rgba(255,106,155,0.12); color: #ff8ab8; }
+  .tag-due.overdue, .tag-due.today    { background: rgba(255,95,109,0.2); color: var(--danger); font-weight:700; }
+  .tag-due.tomorrow { background: rgba(255,179,71,0.18); color: var(--warn); font-weight:600; }
+  .tag-due.soon     { background: rgba(255,213,128,0.15); color: #ffd580; font-weight:600; }
+  .tag-prio-high    { background: rgba(255,95,109,0.15); color: #ff8a93; }
+  .tag-prio-medium  { background: rgba(255,179,71,0.15); color: #ffc97a; }
+  .tag-prio-low     { background: rgba(106,255,203,0.12); color: #6affcb; }
+
+  /* Task image thumbnail */
+  .task-thumb-wrap { margin-top: 8px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); cursor: pointer; }
+  .task-thumb { width: 100%; max-height: 120px; object-fit: cover; display: block; }
+
+  .task-actions { display: flex; gap: 6px; flex-shrink: 0; opacity: 0; transition: opacity 0.2s; }
+  .task-card:hover .task-actions { opacity: 1; }
+  .btn-icon { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--muted); cursor: pointer; font-size: 0.85rem; padding: 7px 10px; line-height: 1; transition: all 0.2s; }
+  .btn-icon.edit:hover   { color: var(--accent); border-color: var(--accent); background: rgba(124,106,255,0.08); }
+  .btn-icon.delete:hover { color: var(--danger); border-color: var(--danger); background: rgba(255,95,109,0.08); }
+
+  .empty { text-align: center; padding: 50px 20px; color: var(--muted); }
+  .empty-icon { font-size: 2.2rem; margin-bottom: 10px; opacity: 0.4; }
+
+  /* ── Calendar View ── */
+  #calendar-view { display: none; }
+  #calendar-view.visible { display: block; }
+  #task-view.hidden { display: none; }
+
+  .cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .cal-month { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700; color: var(--text); }
+  .cal-arrow { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; color: var(--text); cursor: pointer; font-size: 1rem; padding: 8px 14px; transition: all 0.2s; }
+  .cal-arrow:hover { border-color: var(--accent); color: var(--accent); }
+
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .cal-day-header { text-align: center; font-family: 'Syne', sans-serif; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); padding: 6px 0; }
+  .cal-cell { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; min-height: 72px; padding: 6px; cursor: pointer; transition: border-color 0.2s; }
+  .cal-cell:hover { border-color: #3a3a50; }
+  .cal-cell.today { border-color: var(--accent); background: rgba(124,106,255,0.05); }
+  .cal-cell.other-month { opacity: 0.3; cursor: default; }
+  .cal-cell.has-tasks { border-color: rgba(124,106,255,0.35); }
+  .cal-date { font-family: 'Syne', sans-serif; font-size: 0.78rem; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .cal-cell.today .cal-date { color: var(--accent); }
+  .cal-dot-wrap { display: flex; flex-wrap: wrap; gap: 3px; }
+  .cal-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
+  .cal-day-detail { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-top: 16px; display: none; }
+  .cal-day-detail.visible { display: block; }
+  .cal-detail-title { font-family: 'Syne', sans-serif; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 12px; }
+  .cal-task-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
+  .cal-task-row:last-child { border-bottom: none; }
+
+  /* ── Lightbox ── */
+  .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 300; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+  .lightbox.open { opacity: 1; pointer-events: all; }
+  .lightbox img { max-width: 100%; max-height: 90vh; border-radius: 12px; object-fit: contain; }
+  .lightbox-close { position: absolute; top: 20px; right: 24px; background: rgba(255,255,255,0.1); border: none; border-radius: 8px; color: #fff; cursor: pointer; font-size: 1.2rem; padding: 8px 12px; }
+
+  /* ── Footer ── */
+  footer { border-top: 1px solid #1e1e28; margin-top: 48px; padding: 32px 0 48px; text-align: center; }
+  .footer-title { font-family: 'Syne', sans-serif; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: #3a3a50; margin-bottom: 22px; }
+  .tech-grid { display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; }
+  .tech-item { display: flex; flex-direction: column; align-items: center; gap: 7px; }
+  .tech-logo { border-radius: 6px; box-shadow: 0 2px 12px rgba(0,0,0,0.3); display: block; width: 40px; height: 40px; object-fit: contain; }
+  .tech-name { font-size: 0.63rem; color: #4a4a60; font-family: 'DM Sans', sans-serif; font-weight: 500; }
+  .footer-tagline { margin-top: 24px; font-size: 0.65rem; color: #2a2a38; font-family: 'DM Sans', sans-serif; letter-spacing: 0.05em; }
+
+  /* ── Modal ── */
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(6px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+  .modal-backdrop.open { opacity: 1; pointer-events: all; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 26px; width: 100%; max-width: 420px; transform: translateY(20px) scale(0.97); transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1); max-height: 90vh; overflow-y: auto; }
+  .modal-backdrop.open .modal { transform: translateY(0) scale(1); }
+  .modal-title { font-family: 'Syne', sans-serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 18px; background: linear-gradient(135deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .modal input, .modal select { margin-bottom: 10px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 4px; }
+  .btn-save { flex: 1; padding: 12px; background: linear-gradient(135deg, var(--accent), #9b6aff); border: none; border-radius: 12px; color: #fff; font-family: 'Syne', sans-serif; font-size: 0.88rem; font-weight: 600; cursor: pointer; }
+  .btn-save:hover { opacity: 0.9; }
+  .btn-cancel { padding: 12px 18px; background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; color: var(--muted); font-family: 'DM Sans', sans-serif; font-size: 0.88rem; cursor: pointer; }
+  .btn-cancel:hover { color: var(--text); border-color: #3a3a50; }
+
+  /* ── Toast ── */
+  .toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 11px 22px; font-size: 0.84rem; color: var(--text); z-index: 200; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s; opacity: 0; white-space: nowrap; pointer-events: none; }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  /* ── Confetti ── */
+  #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 999; }
+
+  /* ── Notification Permission Bar ── */
+  .perm-bar { display: none; align-items: center; justify-content: space-between; gap: 12px; background: rgba(124,106,255,0.08); border: 1px solid rgba(124,106,255,0.25); border-radius: 14px; padding: 12px 18px; margin-bottom: 18px; font-size: 0.83rem; color: var(--muted); }
+  .perm-bar.visible { display: flex; }
+  .perm-bar-text { display: flex; align-items: center; gap: 8px; }
+  .btn-allow { background: var(--accent); border: none; border-radius: 8px; color: #fff; font-family: 'Syne', sans-serif; font-size: 0.78rem; font-weight: 600; padding: 7px 16px; cursor: pointer; flex-shrink: 0; transition: opacity 0.2s; }
+  .btn-allow:hover { opacity: 0.85; }
+  .btn-dismiss { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; padding: 4px; flex-shrink: 0; }
+  .btn-dismiss:hover { color: var(--text); }
+
+  /* ── Mobile ── */
+  @media (max-width: 480px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .task-actions { opacity: 1; }
+    .cal-cell { min-height: 52px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<!-- Hidden file inputs — outside any overflow:hidden container -->
+<input type="file" id="input-image" accept="image/*" style="display:none">
+<input type="file" id="edit-image"  accept="image/*" style="display:none">
+
+<div class="wrapper">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">StudyFlow</div>
+    <div class="tagline">Your personal academic task manager</div>
+    <div class="stats-bar">
+      <div class="stat"><span id="stat-total">0</span>Total</div>
+      <div class="stat"><span id="stat-pending">0</span>Pending</div>
+      <div class="stat"><span id="stat-done">0</span>Done</div>
+      <div class="stat urgent"><span id="stat-urgent">0</span>Due Soon</div>
+    </div>
+  </header>
+
+  <!-- View Tabs -->
+  <div class="view-tabs">
+    <button class="view-tab active" onclick="switchView('tasks',this)">📋 Tasks</button>
+    <button class="view-tab" onclick="switchView('calendar',this)">📅 Calendar</button>
+  </div>
+
+  <!-- ══ TASK VIEW ══ -->
+  <div id="task-view">
+
+    <!-- Notification Permission Bar -->
+    <div class="perm-bar" id="perm-bar">
+      <span class="perm-bar-text">🔔 Enable notifications to get deadline alerts even when the app is closed.</span>
+      <div style="display:flex;gap:8px;flex-shrink:0">
+        <button class="btn-allow" onclick="requestNotifPermission()">Enable</button>
+        <button class="btn-dismiss" onclick="dismissPermBar()" title="Dismiss">✕</button>
+      </div>
+    </div>
+
+    <!-- Deadline Banner -->
+    <div class="notif-banner" id="notif-banner">
+      <div class="notif-header"><div class="notif-pulse"></div>⚠️ Upcoming Deadlines</div>
+      <div id="notif-items"></div>
+    </div>
+
+    <!-- Add Form -->
+    <div class="add-form">
+      <div class="add-form-bar"></div>
+      <div class="form-title">+ New Task</div>
+      <div class="form-row">
+        <input type="text" id="input-title" placeholder="Task title (e.g. Read Chapter 5)">
+    low: "#6affcb",
 };
 
 const priorityBg = {
